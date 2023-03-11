@@ -1,7 +1,7 @@
 import { Card, CardSuit } from "../../models/cards";
 import { getIconForSuit } from "../../utils/card.utils";
-import { CardComponent } from "../Card/CardComponent";
-import styles from './CardPlaceholderComponent.module.css';
+import { CardComponent } from "../Card/Card";
+import styles from './CardPlaceholder.module.css';
 
 interface CardPlaceholderComponentProps {
     card?: Card;

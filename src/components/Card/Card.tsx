@@ -3,7 +3,7 @@ import { selectCard } from '../../features/gameboard/GameboardSlice';
 import { Card, CardColor } from '../../models/cards';
 import { getCardColorFor, getCardValue, getIconFor } from '../../utils/card.utils';
 import { classes } from '../../utils/style.utils';
-import styles from './CardComponent.module.css';
+import styles from './Card.module.css';
 
 interface CardComponentProps {
     card: Card;

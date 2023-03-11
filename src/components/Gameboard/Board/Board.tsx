@@ -3,8 +3,8 @@ import { selectBoard, selectSelectedCard } from "../../../features/gameboard/Gam
 import { Card } from "../../../models/cards";
 import { cardToString, compareCards } from "../../../utils/card.utils";
 import { classes } from "../../../utils/style.utils";
-import { CardComponent } from "../../Card/CardComponent";
-import styles from './BoardComponent.module.css';
+import { CardComponent } from "../../Card/Card";
+import styles from './Board.module.css';
 
 export const BoardComponent = () => {
     const cardsBoard = useAppSelector(selectBoard);

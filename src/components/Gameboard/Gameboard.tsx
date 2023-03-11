@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { initNewGame, selectBoardInitialized } from "../../features/gameboard/GameboardSlice";
-import { BoardComponent } from "./board/BoardComponent";
-import { CardBufferComponent } from "./buffer/CardBuffer";
-import { CardStackComponent } from "./stack/CardStack";
+import { BoardComponent } from "./Board/Board";
+import { CardBufferComponent } from "./CardBuffer/CardBuffer";
+import { CardStackComponent } from "./CardStack/CardStack";
 
 export const GameBoardComponent = () => {
     const dispatch = useAppDispatch();
