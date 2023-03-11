@@ -1,21 +1,21 @@
 import { useAppSelector } from "../../../app/hooks";
-import { selectBoard } from "../../../features/gameboard/GameboardSlice";
+import { selectBoard, selectSelectedCard } from "../../../features/gameboard/GameboardSlice";
 import { Card } from "../../../models/cards";
-import { cardToString } from "../../../utils/card.utils";
+import { cardToString, compareCards } from "../../../utils/card.utils";
+import { classes } from "../../../utils/style.utils";
 import { CardComponent } from "../../card/CardComponent";
 import styles from './BoardComponent.module.css';
 
 export const BoardComponent = () => {
     const cardsBoard = useAppSelector(selectBoard);
-
-    console.log('Cards board', cardsBoard);
+    const selectedCard = useAppSelector(selectSelectedCard);
 
     return (
         <div className={styles.board}>
             <span className={styles.header}> Cards:</span>
 
             {cardsBoard
-                .map((column, index) => (<BoardColumnComponent cards={column} index={index} key={`column#${index}`} />))}
+                .map((column, index) => (<BoardColumnComponent cards={column} index={index} key={`column#${index}`} selectedCard={selectedCard} />))}
         </div>
     );
 };
@@ -23,14 +23,23 @@ export const BoardComponent = () => {
 interface CardsColumnComponentProps {
     cards: Card[];
     index: number;
+    selectedCard?: Card;
 }
 
-const BoardColumnComponent = ({ cards, index }: CardsColumnComponentProps) => {
+const BoardColumnComponent = ({ cards, index, selectedCard }: CardsColumnComponentProps) => {
     return (
         <div className={styles.column}>
             Column # {index}
             {cards
-                .map((card) => (<CardComponent card={card} key={cardToString(card)} />))}
+                .map((card) => {
+                    const selected = compareCards(card, selectedCard);
+                    const classNames = classes(styles['column-item'], selected ? styles['selected'] : '');
+                    return (
+                        <div className={classNames} key={cardToString(card)}>
+                            <CardComponent card={card} selected={selected} />
+                        </div>);
+                })}
         </div>
     );
 }
+

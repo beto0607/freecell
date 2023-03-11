@@ -1,5 +1,5 @@
 import { Card, CardColor, CardSuit } from '../models/cards';
-import { cardToString, CLUB_ICON, DIAMOD_ICON, getCardColorFor, getCardColorForSuit, getCardValue, getIconFor, HEART_ICON, SPADE_ICON } from './card.utils';
+import { cardToString, CLUB_ICON, compareCards, DIAMOD_ICON, getCardColorFor, getCardColorForSuit, getCardValue, getIconFor, HEART_ICON, SPADE_ICON } from './card.utils';
 
 
 const mockCard: Card = {
@@ -8,7 +8,7 @@ const mockCard: Card = {
 };
 
 describe('card utils', () => {
-    describe.only('getCardValue', () => {
+    describe('getCardValue', () => {
         it('should return undefined when undefined card', () => {
             const cardValue = getCardValue(undefined);
             expect(cardValue).toBeUndefined();
@@ -226,6 +226,68 @@ describe('card utils', () => {
                 suit: CardSuit.Diamond
             });
             expect(icon).toBe(DIAMOD_ICON);
+        });
+    });
+    describe('compareCards', () => {
+        it('should return false when some is undefined', () => {
+            const comparison = compareCards(undefined, undefined);
+            expect(comparison).toBeFalsy();
+            const comparison2 = compareCards(mockCard, undefined);
+            expect(comparison2).toBeFalsy();
+            const comparison3 = compareCards(undefined, mockCard);
+            expect(comparison3).toBeFalsy();
+        });
+        it('should return false when diffrent cards', () => {
+            const aCard: Card = {
+                number: 1,
+                suit: CardSuit.Heart
+            };
+            const anotherCard: Card = {
+                number: 10,
+                suit: CardSuit.Spade
+            };
+            const comparison = compareCards(aCard, anotherCard);
+            expect(comparison).toBeFalsy();
+        });
+        it('should return false when diffrent cards - same suit', () => {
+            const aCard: Card = {
+                number: 1,
+                suit: CardSuit.Heart
+            };
+            const anotherCard: Card = {
+                number: 10,
+                suit: CardSuit.Heart
+            };
+            const comparison = compareCards(aCard, anotherCard);
+            expect(comparison).toBeFalsy();
+        });
+        it('should return false when diffrent cards - same number', () => {
+            const aCard: Card = {
+                number: 1,
+                suit: CardSuit.Spade
+            };
+            const anotherCard: Card = {
+                number: 1,
+                suit: CardSuit.Heart
+            };
+            const comparison = compareCards(aCard, anotherCard);
+            expect(comparison).toBeFalsy();
+        });
+        it('should return true when cards are equal', () => {
+            const aCard: Card = {
+                number: 1,
+                suit: CardSuit.Spade
+            };
+            const anotherCard: Card = {
+                number: 1,
+                suit: CardSuit.Spade
+            };
+            const comparison = compareCards(aCard, anotherCard);
+            expect(comparison).toBeTruthy();
+        });
+        it('should return true when cards are equal - same card object', () => {
+            const comparison = compareCards(mockCard, mockCard);
+            expect(comparison).toBeTruthy();
         });
     });
 });

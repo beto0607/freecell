@@ -1,0 +1,52 @@
+.wrapper{
+    display: flex;
+    flex-direction: column;
+    position:relative;
+    color:white;
+    border: 1px solid black;
+    border-radius: 15px;
+
+    height: 300px;
+    width:200px;
+
+    background-color: rgb(230,230,230);
+    cursor: pointer; 
+}
+
+.wrapper.selected{
+    outline: 2px solid blue;
+
+}
+
+.card-name{
+    padding-top: 0.25em;
+    padding-left: 0.5em;
+    display:flex;
+    flex-direction:column;
+    font-size: 1.15em;
+    text-align: left;
+}
+
+.card-name span{
+    width: 1.5em;
+    line-height: 0.85em;
+}
+
+.figure{
+    height: inherit;
+}
+
+.bottom-card-name{
+    bottom:0;
+    transform: rotate(180deg);
+    place-self: end;
+}
+
+.black{
+    color: black;
+}
+
+.red{
+
+    color:red;
+}

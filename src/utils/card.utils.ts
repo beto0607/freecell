@@ -45,3 +45,11 @@ export const getCardValue = (card: Card | undefined): CardValue | undefined => {
 export const cardToString = (card: Card | undefined): string => {
     return `${getCardValue(card) ?? ''}${getIconFor(card)}`;
 }
+
+export const compareCards = <C extends Card | undefined>(aCard: C, anotherCard: C): boolean => {
+    return !!aCard &&
+        !!anotherCard &&
+        aCard?.suit === anotherCard?.suit &&
+        aCard?.number === anotherCard?.number;
+}
+

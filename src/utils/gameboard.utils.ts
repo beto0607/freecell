@@ -21,6 +21,7 @@ export const initDeck = (): Card[] => {
 
 export const dealCards = (deck: Deck): DealtCards => {
     const shuffledDeck = shuffleArray(deck);
+    console.log(deck, shuffledDeck);
     const dealtCards: DealtCards= [[], [], [], [], [], []];
 
     for (let index = 0; index < shuffledDeck.length; index++) {

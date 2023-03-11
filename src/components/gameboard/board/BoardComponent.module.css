@@ -19,3 +19,10 @@
     display: flex;
     flex-direction: column;
 }
+.column-item{
+    height: 45px;
+    overflow-y: visible;
+}
+.column-item.selected{
+    height: 100px;
+}

@@ -1,13 +1,14 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-import { Card } from "../../models/cards";
+import { Card, DealtCards } from "../../models/cards";
 import { dealCards, initDeck } from "../../utils/gameboard.utils";
 
 export interface GameboardState {
     stack: Card[][]; // 4 stacks
     buffer: Card[]; // 4 cards
-    board: Card[][]; // 6 columns
+    board: DealtCards; // 6 columns
     boardInitialized: boolean;
+    selectedCard?: Card;
 };
 
 const initialState: GameboardState = {
@@ -29,15 +30,23 @@ export const gameboardSlice = createSlice({
             state.board = dealCards(deck);
             state.boardInitialized = true;
         },
+        selectCard: (state, action: PayloadAction<Card | undefined>) => {
+            if (action.payload === state.selectedCard) {
+                state.selectedCard = undefined;
+                return;
+            }
+            state.selectedCard = action.payload;
+        }
     },
 });
 
-export const { initNewGame } = gameboardSlice.actions;
+export const { initNewGame, selectCard } = gameboardSlice.actions;
 
 export const selectBoardInitialized = ({ gameboard }: RootState) => gameboard.boardInitialized;
 export const selectStack = ({ gameboard }: RootState) => gameboard.stack;
 export const selectBuffer = ({ gameboard }: RootState) => gameboard.buffer;
 export const selectBoard = ({ gameboard }: RootState) => gameboard.board
+export const selectSelectedCard = ({ gameboard }: RootState) => gameboard.selectedCard;
 
 
 export default gameboardSlice.reducer;
