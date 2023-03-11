@@ -1,0 +1,21 @@
+.board{
+    width: 100vw;
+    height: 60vh;
+    display: grid;
+    grid-template-columns: auto / 6;
+    grid-template-row: 50px auto;
+}
+
+.header{
+    grid-row: 1;
+    grid-column: span 6;
+    display: block;
+    color: yellow;
+    place-self: center;
+}
+
+.column{
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+}
