@@ -1,5 +1,5 @@
 import { Card, CardColor, CardSuit } from '../models/cards';
-import { cardToString, CLUB_ICON, compareCards, DIAMOD_ICON, getCardColorFor, getCardColorForSuit, getCardValue, getIconFor, HEART_ICON, SPADE_ICON } from './card.utils';
+import { cardToString, CLUB_ICON, compareCards, DIAMOD_ICON, getCardColorFor, getCardColorForSuit, getCardValue, getIconFor, getIconForSuit, HEART_ICON, SPADE_ICON } from './card.utils';
 
 
 const mockCard: Card = {
@@ -228,6 +228,39 @@ describe('card utils', () => {
             expect(icon).toBe(DIAMOD_ICON);
         });
     });
+
+    describe('getIconForSuit', () => {
+        it('should return empty string when undefined', () => {
+            const icon = getIconForSuit(undefined);
+            expect(icon).toBe("");
+        });
+        it('should return empty string when invalid suit', () => {
+            const icon = getIconForSuit(CardSuit.Invalid);
+            expect(icon).toBe("");
+        });
+        it('should return empty string when empty object', () => {
+            const icon = getIconForSuit("" as CardSuit);
+            expect(icon).toBe("");
+        });
+
+        it('should return Spade icon', () => {
+            const icon = getIconForSuit(CardSuit.Spade);
+            expect(icon).toBe(SPADE_ICON);
+        });
+        it('should return Club icon', () => {
+            const icon = getIconForSuit(CardSuit.Club);
+            expect(icon).toBe(CLUB_ICON);
+        });
+        it('should return Heart icon', () => {
+            const icon = getIconForSuit(CardSuit.Heart);
+            expect(icon).toBe(HEART_ICON);
+        });
+        it('should return Diamond icon', () => {
+            const icon = getIconForSuit(CardSuit.Diamond);
+            expect(icon).toBe(DIAMOD_ICON);
+        });
+    });
+
     describe('compareCards', () => {
         it('should return false when some is undefined', () => {
             const comparison = compareCards(undefined, undefined);

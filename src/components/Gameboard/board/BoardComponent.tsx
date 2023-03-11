@@ -3,7 +3,7 @@ import { selectBoard, selectSelectedCard } from "../../../features/gameboard/Gam
 import { Card } from "../../../models/cards";
 import { cardToString, compareCards } from "../../../utils/card.utils";
 import { classes } from "../../../utils/style.utils";
-import { CardComponent } from "../../card/CardComponent";
+import { CardComponent } from "../../Card/CardComponent";
 import styles from './BoardComponent.module.css';
 
 export const BoardComponent = () => {

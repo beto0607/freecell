@@ -1,6 +1,6 @@
 import './App.css';
-import { GameBoardComponent } from './components/gameboard/Gameboard';
-import { InitGameButton } from './components/initGameButton/InitGameButton';
+import { GameBoardComponent } from './components/Gameboard/Gameboard';
+import { InitGameButton } from './components/InitGameButton/InitGameButton';
 
 function App() {
     return (

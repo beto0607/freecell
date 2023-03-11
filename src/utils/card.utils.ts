@@ -6,8 +6,8 @@ export const SPADE_ICON = "♠";
 export const DIAMOD_ICON = "♦";
 export const HEART_ICON = "♥";
 
-export const getIconFor = (card: Card | undefined): string => {
-    switch (card?.suit) {
+export const getIconForSuit = (suit: CardSuit | undefined): string => {
+    switch (suit) {
         case CardSuit.Club:
             return CLUB_ICON;
         case CardSuit.Spade:
@@ -19,6 +19,10 @@ export const getIconFor = (card: Card | undefined): string => {
         default:
             return "";
     }
+}
+
+export const getIconFor = (card: Card | undefined): string => {
+    return getIconForSuit(card?.suit);
 }
 
 export const getCardColorForSuit = (cardSuit: CardSuit | undefined): CardColor => {
