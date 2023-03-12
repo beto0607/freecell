@@ -1,28 +1,27 @@
-import { useAppDispatch } from '../../app/hooks';
-import { selectCard } from '../../features/gameboard/GameboardSlice';
+import { useAppSelector } from '../../app/hooks';
+import { selectSelectedCard } from '../../features/gameboard/GameboardSlice';
 import { Card, CardColor } from '../../models/cards';
-import { getCardColorFor, getCardValue, getIconFor } from '../../utils/card.utils';
+import cardStyles from '../../styles/card.module.css';
+import { compareCards, getCardColorFor, getCardValue, getIconFor } from '../../utils/card.utils';
 import { classes } from '../../utils/style.utils';
 import styles from './Card.module.css';
 
 interface CardComponentProps {
     card: Card;
-    selected?: boolean;
     onClick?: (card: Card) => void;
 }
 
-export const CardComponent = ({ card, selected, onClick }: CardComponentProps) => {
-    const dispatch = useAppDispatch();
+export const CardComponent = ({ card, onClick }: CardComponentProps) => {
+    const selectedCard = useAppSelector(selectSelectedCard);
     const cardColor = getCardColorFor(card);
-    const colorClass = cardColor === CardColor.Black ? styles.black : styles.red;
+    const colorClass = cardColor === CardColor.Black ? cardStyles.black : cardStyles.red;
 
-    const selectedClass = selected ? styles.selected : '';
+    const selectedClass = compareCards(selectedCard, card) ? styles.selected : '';
 
     const classNames = classes(styles.wrapper, colorClass, selectedClass);
 
 
     const onCardClicked = () => {
-        dispatch(selectCard(card));
         onClick?.(card);
     };
 

@@ -1,19 +1,34 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-import { Card, DealtCards } from "../../models/cards";
-import { dealCards, initDeck } from "../../utils/gameboard.utils";
+import { Card, CardsBuffers, CardsBuffersKeys, CardsStacks, CardsStacksKeys, CardSuit, DealtCards } from "../../models/cards";
+import { compareCards } from "../../utils/card.utils";
+import { dealCards, initDeck, isCardMovableToBuffer, isCardMovableToStack, removeCard } from "../../utils/gameboard.utils";
 
 export interface GameboardState {
-    stack: Card[][]; // 4 stacks
-    buffer: Card[]; // 4 cards
+    stacks: CardsStacks;
+    buffers: CardsBuffers;
     board: DealtCards; // 6 columns
     boardInitialized: boolean;
     selectedCard?: Card;
 };
 
+const initialStacks: CardsStacks = {
+    [CardSuit.Club]: [],
+    [CardSuit.Spade]: [],
+    [CardSuit.Heart]: [],
+    [CardSuit.Diamond]: [],
+};
+
+const initialBuffers: CardsBuffers = {
+    0: undefined,
+    1: undefined,
+    2: undefined,
+    3: undefined,
+}
+
 const initialState: GameboardState = {
-    stack: [[], [], [], []],
-    buffer: [],
+    stacks: initialStacks,
+    buffers: initialBuffers,
     board: [],
     boardInitialized: false,
 };
@@ -24,27 +39,56 @@ export const gameboardSlice = createSlice({
     initialState,
     reducers: {
         initNewGame: (state) => {
-            state.stack = [[], [], [], []];
-            state.buffer = [];
+            state.stacks = initialStacks;
+            state.buffers = initialBuffers;
             const deck = initDeck();
             state.board = dealCards(deck);
             state.boardInitialized = true;
         },
         selectCard: (state, action: PayloadAction<Card | undefined>) => {
-            if (action.payload === state.selectedCard) {
+            if (compareCards(action.payload, state.selectedCard)) {
                 state.selectedCard = undefined;
                 return;
             }
             state.selectedCard = action.payload;
+        },
+        bufferClicked: (state, { payload: { bufferId, card } }: PayloadAction<{ bufferId: CardsBuffersKeys, card: Card | undefined }>) => {
+            if (!state.selectedCard) {
+                state.selectedCard = card;
+                return;
+            }
+            if (compareCards(card, state.selectedCard)) {
+                state.selectedCard = undefined;
+                return;
+            }
+            if (!state.buffers[bufferId] && isCardMovableToBuffer(state.board, state.stacks, state.selectedCard)) {
+                state.buffers[bufferId] = state.selectedCard;
+                removeCard(state.board, state.stacks, undefined, state.selectedCard);
+            }
+        },
+        stackClicked: (state, { payload: { stackId } }: PayloadAction<{ stackId: CardsStacksKeys, card: Card | undefined }>) => {
+            const card = state.stacks[stackId].at(-1);
+            if (!state.selectedCard) {
+                state.selectedCard = card;
+                return;
+            }
+            if (compareCards(state.selectedCard, card)) {
+                state.selectedCard = undefined;
+                return;
+            }
+            if (isCardMovableToStack(state.board, state.buffers, state.stacks, stackId, state.selectedCard)) {
+                state.stacks[stackId]!.push(state.selectedCard);
+                removeCard(state.board, undefined, state.buffers, state.selectedCard);
+            }
         }
     },
 });
 
-export const { initNewGame, selectCard } = gameboardSlice.actions;
+export const { initNewGame, selectCard, bufferClicked, stackClicked } = gameboardSlice.actions;
 
 export const selectBoardInitialized = ({ gameboard }: RootState) => gameboard.boardInitialized;
-export const selectStack = ({ gameboard }: RootState) => gameboard.stack;
-export const selectBuffer = ({ gameboard }: RootState) => gameboard.buffer;
+export const selectStacks = ({ gameboard }: RootState) => gameboard.stacks;
+export const selectBuffers = ({ gameboard }: RootState) => gameboard.buffers;
 export const selectBoard = ({ gameboard }: RootState) => gameboard.board
 export const selectSelectedCard = ({ gameboard }: RootState) => gameboard.selectedCard;
 

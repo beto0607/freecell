@@ -1,14 +1,26 @@
-import { useAppSelector } from "../../../app/hooks";
-import { selectBuffer } from "../../../features/gameboard/GameboardSlice";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import { bufferClicked, selectBuffers } from "../../../features/gameboard/GameboardSlice";
+import { CardsBuffers } from "../../../models/cards";
+import { CardPlaceholderClickHandlerData, CardPlaceholderComponent } from "../../CardPlaceholder/CardPlaceholder";
+import styles from './CardBuffer.module.css';
 
 export const CardBufferComponent = () => {
-
-    const cardBuffer = useAppSelector(selectBuffer);
+    const dispatch = useAppDispatch();
+    const cardBuffer = useAppSelector(selectBuffers);
 
     console.log('CardBuffer', cardBuffer);
+    const onBufferClicked = (bufferId: keyof CardsBuffers, data: CardPlaceholderClickHandlerData) => {
+        console.log(data);
+        
+        dispatch(bufferClicked({ bufferId, card: data.card }));
+    };
+
     return (
-        <div>
-            Card Buffer
+        <div className={styles.wrapper}>
+            <CardPlaceholderComponent card={cardBuffer[0]} onClick={(_) => onBufferClicked(0, _)} />
+            <CardPlaceholderComponent card={cardBuffer[1]} onClick={(_) => onBufferClicked(1, _)} />
+            <CardPlaceholderComponent card={cardBuffer[2]} onClick={(_) => onBufferClicked(2, _)} />
+            <CardPlaceholderComponent card={cardBuffer[3]} onClick={(_) => onBufferClicked(3, _)} />
         </div>
     );
 };

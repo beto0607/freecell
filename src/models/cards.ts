@@ -22,3 +22,19 @@ export interface Card {
 export type Deck = Array<Card>;
 
 export type DealtCards = Array<Array<Card>>; // 6 columns of 8/9 cards each
+
+export type CardsBuffers = {
+    0: Card | undefined,
+    1: Card | undefined,
+    2: Card | undefined,
+    3: Card | undefined,
+};
+export type CardsBuffersKeys = keyof CardsBuffers;
+
+export type CardsStacks = {
+    [CardSuit.Club]: Array<Card>;
+    [CardSuit.Spade]: Array<Card>;
+    [CardSuit.Heart]: Array<Card>;
+    [CardSuit.Diamond]: Array<Card>;
+};
+export type CardsStacksKeys = keyof CardsStacks;

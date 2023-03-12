@@ -1,5 +1,5 @@
-import { useAppSelector } from "../../../app/hooks";
-import { selectBoard, selectSelectedCard } from "../../../features/gameboard/GameboardSlice";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import { selectBoard, selectCard, selectSelectedCard } from "../../../features/gameboard/GameboardSlice";
 import { Card } from "../../../models/cards";
 import { cardToString, compareCards } from "../../../utils/card.utils";
 import { classes } from "../../../utils/style.utils";
@@ -12,8 +12,6 @@ export const BoardComponent = () => {
 
     return (
         <div className={styles.board}>
-            <span className={styles.header}> Cards:</span>
-
             {cardsBoard
                 .map((column, index) => (<BoardColumnComponent cards={column} index={index} key={`column#${index}`} selectedCard={selectedCard} />))}
         </div>
@@ -27,16 +25,16 @@ interface CardsColumnComponentProps {
 }
 
 const BoardColumnComponent = ({ cards, index, selectedCard }: CardsColumnComponentProps) => {
+    const dispatch = useAppDispatch();
     return (
         <div className={styles.column}>
-            Column # {index}
             {cards
                 .map((card) => {
                     const selected = compareCards(card, selectedCard);
                     const classNames = classes(styles['column-item'], selected ? styles['selected'] : '');
                     return (
                         <div className={classNames} key={cardToString(card)}>
-                            <CardComponent card={card} selected={selected} />
+                            <CardComponent card={card} onClick={() => dispatch(selectCard(card))} />
                         </div>);
                 })}
         </div>

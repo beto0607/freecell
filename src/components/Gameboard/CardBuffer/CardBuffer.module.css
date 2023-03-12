@@ -1,0 +1,8 @@
+.wrapper{
+    display: flex;
+    align-items:center;
+    flex-direction: row;
+    height: calc(1em + var(--card-height));
+    width: 100%;
+    justify-content: space-evenly;
+}

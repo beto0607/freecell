@@ -1,24 +1,15 @@
 .board{
-    width: 100vw;
-    height: 60vh;
+    margin-top: 2em;
     display: grid;
-    grid-template-columns: auto / 6;
-    grid-template-row: 50px auto;
-}
-
-.header{
-    grid-row: 1;
-    grid-column: span 6;
-    display: block;
-    color: yellow;
-    place-self: center;
+    justify-content: space-evenly;
 }
 
 .column{
-    grid-row: 2;
+    grid-row: 1;
     display: flex;
     flex-direction: column;
 }
+
 .column-item{
     height: 45px;
     overflow-y: visible;

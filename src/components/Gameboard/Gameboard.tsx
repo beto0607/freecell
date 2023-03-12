@@ -4,6 +4,7 @@ import { initNewGame, selectBoardInitialized } from "../../features/gameboard/Ga
 import { BoardComponent } from "./Board/Board";
 import { CardBufferComponent } from "./CardBuffer/CardBuffer";
 import { CardStackComponent } from "./CardStack/CardStack";
+import styles from './Gameboard.module.css';
 
 export const GameBoardComponent = () => {
     const dispatch = useAppDispatch();
@@ -20,12 +21,10 @@ export const GameBoardComponent = () => {
     }
 
     return (
-        <div>
-            <div className="top">
-                <CardBufferComponent />
-                <CardStackComponent />
-            </div>
-            <div className="center">
+        <div className={styles.wrapper}>
+            <CardBufferComponent />
+            <CardStackComponent />
+            <div className={styles.board}>
                 <BoardComponent />
             </div>
         </div>

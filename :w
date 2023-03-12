@@ -1,8 +1,9 @@
 .wrapper{
     display:flex;
-    width: var(--card-width);
-    height: var(--card-height);
-    outline: 3px solid white;
+    width: calc(var(--card-width));
+    height: calc(var(--card-height) );
+    margin: 2px;
+    border: 3px solid white;
     border-radius: 15px;
     background-color: green;
     cursor: pointer;
