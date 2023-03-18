@@ -27,7 +27,7 @@ interface CardsColumnComponentProps {
 const BoardColumnComponent = ({ cards, selectedCard }: CardsColumnComponentProps) => {
     const dispatch = useAppDispatch();
     const onCardClicked = (card: Card) => {
-        dispatch(selectCard(card));
+        dispatch(selectCard({ card }));
     };
     return (
         <div className={styles.column}>
