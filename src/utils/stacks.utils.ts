@@ -34,8 +34,7 @@ export const removeCardFromStacks = (stacks: CardsStacks, card: Card | undefined
     }
 };
 
-// TODO: Add tests
-export const isCardMovableToStack = (board: DealtCards, buffers: CardsBuffers, stacks: CardsStacks, stackId: CardsStacksKeys, card: Card | undefined): boolean => {
+export const isCardMovableToStack = (stacks: CardsStacks, stackId: CardsStacksKeys, card: Card | undefined): boolean => {
     if (!card) {
         return false;
     }
@@ -46,10 +45,7 @@ export const isCardMovableToStack = (board: DealtCards, buffers: CardsBuffers, s
     if ((stack.at(-1)?.number ?? 0) !== card.number - 1) {
         return false;
     }
-    return (
-        Object.values(buffers).some((bufferCard) => compareCards(bufferCard, card)) ||
-        board.some((column) => compareCards(card, column.at(-1)))
-    );
+    return true;
 }
 
 export const moveCardToColumnFromStacks = (board: DealtCards, stacks: CardsStacks, card: Card | undefined, targetColmunIndex: number): void => {
