@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import { Card, CardsBuffers, CardsBuffersKeys, CardsStacks, CardsStacksKeys, CardSuit, DealtCards } from "../../models/cards";
-import { isCardInBuffers } from "../../utils/buffers.utils";
+import { isCardInBuffers, isCardMovableToBuffer, moveCardToColumnFromBuffers } from "../../utils/buffers.utils";
 import { compareCards } from "../../utils/card.utils";
 import { getColumnIndexForCard } from "../../utils/column.utils";
-import { isCardMovableToBuffer, isCardMovableToColumn, isCardMovableToStack, moveCardToColumn, moveCardToColumnFromBuffers, moveCardToColumnFromStacks, removeCard } from "../../utils/gameboard.utils";
-import { dealCards, initDeck, } from '../../utils/deck.utils'
-import { isCardInStacks } from "../../utils/stacks.utils";
+import { dealCards, initDeck } from '../../utils/deck.utils';
+import { isCardMovableToColumn, moveCardToColumn, removeCard } from "../../utils/gameboard.utils";
+import { isCardInStacks, isCardMovableToStack, moveCardToColumnFromStacks } from "../../utils/stacks.utils";
 
 export interface GameboardState {
     stacks: CardsStacks;

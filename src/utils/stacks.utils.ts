@@ -1,4 +1,4 @@
-import { Card, CardsStacks, CardsStacksKeys, CardSuit } from "../models/cards";
+import { Card, CardsBuffers, CardsStacks, CardsStacksKeys, CardSuit, DealtCards } from "../models/cards";
 import { compareCards } from "./card.utils";
 
 export const STACK_KEYS: CardsStacksKeys[] = [
@@ -33,3 +33,34 @@ export const removeCardFromStacks = (stacks: CardsStacks, card: Card | undefined
         }
     }
 };
+
+// TODO: Add tests
+export const isCardMovableToStack = (board: DealtCards, buffers: CardsBuffers, stacks: CardsStacks, stackId: CardsStacksKeys, card: Card | undefined): boolean => {
+    if (!card) {
+        return false;
+    }
+    if (stackId !== card.suit) {
+        return false;
+    }
+    const stack = stacks[stackId];
+    if ((stack.at(-1)?.number ?? 0) !== card.number - 1) {
+        return false;
+    }
+    return (
+        Object.values(buffers).some((bufferCard) => compareCards(bufferCard, card)) ||
+        board.some((column) => compareCards(card, column.at(-1)))
+    );
+}
+
+export const moveCardToColumnFromStacks = (board: DealtCards, stacks: CardsStacks, card: Card | undefined, targetColmunIndex: number): void => {
+    if (
+        !board[targetColmunIndex] ||
+        !card
+    ) {
+        return;
+    }
+
+    board[targetColmunIndex].push(card);
+    removeCardFromStacks(stacks, card);
+};
+

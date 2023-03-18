@@ -6,14 +6,14 @@ export const CARD_NUMBERS: Card['number'][] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 export const COLUMN_COUNT = 8;
 
 export const initDeck = (): Card[] => {
-    const deck: Card[] = []; for (let index = 0; index < 52; index++) {
+    const deck: Card[] = []; 
+    for (let index = 0; index < 52; index++) {
         const number: Card['number'] = CARD_NUMBERS[index % 13];
         const suit = CARD_SUITS[Math.floor(index / 13)];
         deck.push({
             suit,
             number,
         });
-
     }
     return deck;
 };

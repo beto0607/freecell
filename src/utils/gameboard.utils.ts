@@ -1,19 +1,7 @@
-import { Card, CardsBuffers, CardsStacks, CardsStacksKeys, DealtCards } from "../models/cards";
-import { BUFFER_KEYS, removeCardFromBuffers } from "./buffers.utils";
+import { Card, CardsBuffers, CardsStacks, DealtCards } from "../models/cards";
+import { BUFFER_KEYS } from "./buffers.utils";
 import { compareCards, isCardStackableWith } from "./card.utils";
 import { getCardIndexInColumn, getColumnIndexForCard } from "./column.utils";
-import { removeCardFromStacks } from "./stacks.utils";
-
-// TODO: Add tests
-export const isCardMovableToBuffer = (board: DealtCards, stacks: CardsStacks, card: Card | undefined): boolean => {
-    if (!card) {
-        return false;
-    }
-    return (
-        Object.values(stacks).some((stack) => compareCards(card, stack.at(-1))) ||
-        board.some((column) => compareCards(card, column.at(-1)))
-    );
-};
 
 export const isCardMovableToColumn = (board: DealtCards, card: Card | undefined, targetColmunIndex: number): boolean => {
     const targetColumn = board[targetColmunIndex];
@@ -43,24 +31,6 @@ export const isCardMovableToColumn = (board: DealtCards, card: Card | undefined,
     return targetColumn.length === 0 ||
         isCardStackableWith(stackOfCardsToMove[0], targetColumn.at(-1));
 };
-
-// TODO: Add tests
-export const isCardMovableToStack = (board: DealtCards, buffers: CardsBuffers, stacks: CardsStacks, stackId: CardsStacksKeys, card: Card | undefined): boolean => {
-    if (!card) {
-        return false;
-    }
-    if (stackId !== card.suit) {
-        return false;
-    }
-    const stack = stacks[stackId];
-    if ((stack.at(-1)?.number ?? 0) !== card.number - 1) {
-        return false;
-    }
-    return (
-        Object.values(buffers).some((bufferCard) => compareCards(bufferCard, card)) ||
-        board.some((column) => compareCards(card, column.at(-1)))
-    );
-}
 
 // TODO: Add tests
 export const removeCard = (board: DealtCards, stacks: CardsStacks | undefined, buffers: CardsBuffers | undefined, card: Card): void => {
@@ -109,30 +79,5 @@ export const moveCardToColumn = (board: DealtCards, card: Card | undefined, targ
         ...board[targetColmunIndex],
         ...sourceColumn.slice(cardIndexInColumn, sourceColumn.length)
     ];
-};
-
-// -- Buffers
-export const moveCardToColumnFromBuffers = (board: DealtCards, buffers: CardsBuffers, card: Card | undefined, targetColmunIndex: number): void => {
-    if (
-        !board[targetColmunIndex] ||
-        !card
-    ) {
-        return;
-    }
-    board[targetColmunIndex].push(card);
-    removeCardFromBuffers(buffers, card);
-}
-
-// -- Stacks
-export const moveCardToColumnFromStacks = (board: DealtCards, stacks: CardsStacks, card: Card | undefined, targetColmunIndex: number): void => {
-    if (
-        !board[targetColmunIndex] ||
-        !card
-    ) {
-        return;
-    }
-
-    board[targetColmunIndex].push(card);
-    removeCardFromStacks(stacks, card);
 };
 

@@ -1,5 +1,5 @@
 import { Card, CardsBuffers, CardSuit } from "../models/cards";
-import { getBufferIndexForCard, isCardInBuffers } from "./buffers.utils";
+import { getBufferIndexForCard, isCardInBuffers, removeCardFromBuffers } from "./buffers.utils";
 
 describe('buffer utils', () => {
     const mockCard: Card = {
@@ -7,7 +7,7 @@ describe('buffer utils', () => {
         suit: CardSuit.Heart
     };
 
-    let buffers: CardsBuffers ; 
+    let buffers: CardsBuffers;
 
     beforeEach(() => {
         buffers = {
@@ -51,8 +51,19 @@ describe('buffer utils', () => {
         });
     });
 
-    describe.skip('removeCardFromBuffers', ()=>{
-
-
+    describe('removeCardFromBuffers', () => {
+        it('should remove card from buffers', () => {
+            buffers[0] = mockCard;
+            removeCardFromBuffers(buffers, mockCard);
+            expect(buffers[0]).toBeUndefined();
+        });
+        it('should not remove card from buffers - card not found', () => {
+            buffers[0] = {
+                number: 3,
+                suit: CardSuit.Diamond
+            };
+            removeCardFromBuffers(buffers, mockCard);
+            expect(buffers[0]).not.toBeUndefined();
+        });
     });
 });
