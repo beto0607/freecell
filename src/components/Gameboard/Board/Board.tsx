@@ -24,8 +24,11 @@ interface CardsColumnComponentProps {
     selectedCard?: Card;
 }
 
-const BoardColumnComponent = ({ cards, index, selectedCard }: CardsColumnComponentProps) => {
+const BoardColumnComponent = ({ cards, selectedCard }: CardsColumnComponentProps) => {
     const dispatch = useAppDispatch();
+    const onCardClicked = (card: Card) => {
+        dispatch(selectCard(card));
+    };
     return (
         <div className={styles.column}>
             {cards
@@ -34,7 +37,7 @@ const BoardColumnComponent = ({ cards, index, selectedCard }: CardsColumnCompone
                     const classNames = classes(styles['column-item'], selected ? styles['selected'] : '');
                     return (
                         <div className={classNames} key={cardToString(card)}>
-                            <CardComponent card={card} onClick={() => dispatch(selectCard(card))} />
+                            <CardComponent card={card} onClick={onCardClicked} />
                         </div>);
                 })}
         </div>

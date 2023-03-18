@@ -23,7 +23,7 @@ export const CardPlaceholderComponent = ({ card, suit, onClick }: CardPlaceholde
     return (
         <div className={styles.wrapper} onClick={onCardPlaceholderClicked}>
             {card ?
-                (<CardComponent card={card} onClick={onCardPlaceholderClicked} />) :
+                (<CardComponent card={card} />) :
 
                 (icon &&
                     <span className={classes(styleColor, styles['stack-span'])}>

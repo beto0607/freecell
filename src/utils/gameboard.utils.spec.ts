@@ -1,6 +1,8 @@
-import { Card, CardSuit, DealtCards, Deck } from '../models/cards';
+import { buffer } from 'stream/consumers';
+import { Card, CardsBuffers, CardsStacks, CardSuit, DealtCards, Deck } from '../models/cards';
 import { columnContainsCard } from './column.utils';
 import { dealCards, initDeck, isCardMovableToColumn, moveCardToColumn } from './gameboard.utils';
+import { initStacks } from './stacks.utils';
 
 describe('gameboard utils', () => {
     describe('initDeck', () => {
@@ -91,22 +93,31 @@ describe('gameboard utils', () => {
     describe('moveCardToColmun', () => {
         let dealtCards: DealtCards;
         const targetColumnIndex = 3;
+        let buffers: CardsBuffers;
+        let stacks: CardsStacks;
 
         beforeEach(() => {
             const initialDeck = initDeck();
             dealtCards = dealCards(initialDeck);
+            stacks = initStacks();
+            buffers = {
+                0: undefined,
+                1: undefined,
+                2: undefined,
+                3: undefined,
+            };
         });
 
         it('should move a card from a column to another', () => {
             const card = dealtCards[0].at(-1); // last card from first colmun
-            moveCardToColumn(dealtCards, card, targetColumnIndex)
+            moveCardToColumn(dealtCards, buffers, stacks, card, targetColumnIndex)
             expect(columnContainsCard(dealtCards[3], card)).toBeTruthy();
             expect(columnContainsCard(dealtCards[0], card)).toBeFalsy();
         });
 
         it('should move many cards', () => {
             const card = dealtCards[0][0];
-            moveCardToColumn(dealtCards, card, targetColumnIndex)
+            moveCardToColumn(dealtCards, buffers, stacks, card, targetColumnIndex)
             expect(columnContainsCard(dealtCards[0], card)).toBeFalsy();
             expect(dealtCards[0]).toHaveLength(0);
             expect(columnContainsCard(dealtCards[3], card)).toBeTruthy();
@@ -115,20 +126,20 @@ describe('gameboard utils', () => {
 
         it('should not move undefined card', () => {
             const card = undefined; // last card from first colmun
-            moveCardToColumn(dealtCards, card, targetColumnIndex)
+            moveCardToColumn(dealtCards, buffers, stacks, card, targetColumnIndex)
             expect(columnContainsCard(dealtCards[0], card)).toBeFalsy();
             expect(columnContainsCard(dealtCards[3], card)).toBeFalsy();
         });
 
         it('should not move to an invalid targetIndex', () => {
             const card = dealtCards[0][0];
-            moveCardToColumn(dealtCards, card, -1)
+            moveCardToColumn(dealtCards, buffers, stacks, card, -1)
             expect(columnContainsCard(dealtCards[0], card)).toBeTruthy();
         });
 
         it('should not move card that aren\'t in the board', () => {
             const card = dealtCards[0].pop(); // pop removes the card from the board
-            moveCardToColumn(dealtCards, card, 3);
+            moveCardToColumn(dealtCards, buffers, stacks, card, 3);
             expect(columnContainsCard(dealtCards[0], card)).toBeFalsy();
             expect(columnContainsCard(dealtCards[3], card)).toBeFalsy();
         });
@@ -136,75 +147,86 @@ describe('gameboard utils', () => {
 
     describe('isCardMovableToColumn', () => {
         let dealtCards: DealtCards;
+        let buffers: CardsBuffers;
 
         beforeEach(() => {
             const initialDeck = initDeck();
             dealtCards = dealCards(initialDeck);
-        });
-
-        it('should return false - undefined card', () => {
-            expect(isCardMovableToColumn(dealtCards, undefined, 3)).toBe(false);
-        });
-
-        it('should return false - invalid target', () => {
-            expect(isCardMovableToColumn(dealtCards, dealtCards[0][0], -1)).toBe(false);
-        });
-
-        it('should return false - card not movable to target', () => {
-            const card = dealtCards[0].at(-1);
-            expect(isCardMovableToColumn(dealtCards, card, 3)).toBe(false);
-        });
-
-        it('should return false - invalid card from buffer/stacks', () => {
-            const dealtCards: DealtCards = [
-                [
-                    {
-                        number: 2,
-                        suit: CardSuit.Spade,
-                    },
-                ],
-            ];
-            const card: Card = {
-                number: 2,
-                suit: CardSuit.Heart
+            buffers = {
+                0: undefined,
+                1: undefined,
+                2: undefined,
+                3: undefined,
             };
-            expect(isCardMovableToColumn(dealtCards, card, 0)).toBe(false);
         });
 
-        it('should return true - valid card from buffer/stacks', () => {
-            const dealtCards: DealtCards = [
-                [
-                    {
-                        number: 2,
-                        suit: CardSuit.Spade,
-                    },
-                ],
-            ];
-            const card: Card = {
-                number: 1,
-                suit: CardSuit.Heart
-            };
-            expect(isCardMovableToColumn(dealtCards, card, 0)).toBe(true);
+        describe('invalid cards', () => {
+            it('should return false - undefined card', () => {
+                expect(isCardMovableToColumn(dealtCards, buffers, undefined, 3)).toBe(false);
+            });
+
+            it('should return false - invalid target', () => {
+                expect(isCardMovableToColumn(dealtCards, buffers, dealtCards[0][0], -1)).toBe(false);
+            });
         });
 
-        it('should return true - last card in column', () => {
-            dealtCards = [
-                [
-                    {
-                        number: 1,
-                        suit: CardSuit.Heart
-                    },
-                ],
-                [
-                    {
-                        number: 2,
-                        suit: CardSuit.Spade,
-                    },
-                ],
-            ];
-            const card = dealtCards[0][0];
+        describe('single', () => {
+            it('should return false - card not movable to target', () => {
+                const card = dealtCards[0].at(-1);
+                expect(isCardMovableToColumn(dealtCards, buffers, card, 3)).toBe(false);
+            });
 
-            expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(true);
+            it('should return false - invalid card from buffer/stacks', () => {
+                const dealtCards: DealtCards = [
+                    [
+                        {
+                            number: 2,
+                            suit: CardSuit.Spade,
+                        },
+                    ],
+                ];
+                const card: Card = {
+                    number: 2,
+                    suit: CardSuit.Heart
+                };
+                expect(isCardMovableToColumn(dealtCards, buffers, card, 0)).toBe(false);
+            });
+
+            it('should return true - valid card from buffer/stacks', () => {
+                const dealtCards: DealtCards = [
+                    [
+                        {
+                            number: 2,
+                            suit: CardSuit.Spade,
+                        },
+                    ],
+                ];
+                const card: Card = {
+                    number: 1,
+                    suit: CardSuit.Heart
+                };
+                expect(isCardMovableToColumn(dealtCards, buffers, card, 0)).toBe(true);
+            });
+
+            it('should return true - last card in column', () => {
+                dealtCards = [
+                    [
+                        {
+                            number: 1,
+                            suit: CardSuit.Heart
+                        },
+                    ],
+                    [
+                        {
+                            number: 2,
+                            suit: CardSuit.Spade,
+                        },
+                    ],
+                ];
+                const card = dealtCards[0][0];
+
+                expect(isCardMovableToColumn(dealtCards, buffers, card, 1)).toBe(true);
+            });
         });
         it('should return true - many cards in column', () => {
             dealtCards = [
@@ -230,9 +252,9 @@ describe('gameboard utils', () => {
                 ],
             ];
             let card = dealtCards[0][1];
-            expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(true);
+            expect(isCardMovableToColumn(dealtCards, buffers, card, 1)).toBe(true);
             card = dealtCards[0][2];
-            expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(false);
+            expect(isCardMovableToColumn(dealtCards, buffers, card, 1)).toBe(false);
         });
 
         it('should return true - empty target', () => {
@@ -251,9 +273,9 @@ describe('gameboard utils', () => {
                 ],
             ];
             let card = dealtCards[0][1];
-            expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(true);
+            expect(isCardMovableToColumn(dealtCards, buffers, card, 1)).toBe(true);
             card = dealtCards[0][0];
-            expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(true);
+            expect(isCardMovableToColumn(dealtCards, buffers, card, 1)).toBe(true);
         });
     });
 });

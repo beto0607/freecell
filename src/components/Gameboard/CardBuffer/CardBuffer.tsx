@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
-import { bufferClicked, selectBuffers } from "../../../features/gameboard/GameboardSlice";
+import { bufferClicked, selectBuffers, selectSelectedCard } from "../../../features/gameboard/GameboardSlice";
 import { CardsBuffers } from "../../../models/cards";
 import { CardPlaceholderClickHandlerData, CardPlaceholderComponent } from "../../CardPlaceholder/CardPlaceholder";
 import styles from './CardBuffer.module.css';
@@ -7,12 +7,9 @@ import styles from './CardBuffer.module.css';
 export const CardBufferComponent = () => {
     const dispatch = useAppDispatch();
     const cardBuffer = useAppSelector(selectBuffers);
-
-    console.log('CardBuffer', cardBuffer);
+    const selectedCard = useAppSelector(selectSelectedCard);
     const onBufferClicked = (bufferId: keyof CardsBuffers, data: CardPlaceholderClickHandlerData) => {
-        console.log(data);
-        
-        dispatch(bufferClicked({ bufferId, card: data.card }));
+        dispatch(bufferClicked({ bufferId, card: selectedCard }));
     };
 
     return (

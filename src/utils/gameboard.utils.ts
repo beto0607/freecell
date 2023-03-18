@@ -48,7 +48,7 @@ export const isCardMovableToBuffer = (board: DealtCards, stacks: CardsStacks, ca
     );
 };
 
-export const isCardMovableToColumn = (board: DealtCards, card: Card | undefined, targetColmunIndex: number): boolean => {
+export const isCardMovableToColumn = (board: DealtCards, buffers: CardsBuffers, card: Card | undefined, targetColmunIndex: number): boolean => {
     const targetColumn = board[targetColmunIndex];
     if (!card || !targetColumn) {
         return false;
@@ -68,7 +68,6 @@ export const isCardMovableToColumn = (board: DealtCards, card: Card | undefined,
     }
     // Multiple cards
     const stackOfCardsToMove = sourceColumn.slice(cardIndexInColumn);
-    console.log(stackOfCardsToMove);
     for (let i = 1; i < stackOfCardsToMove.length; i++) {
         if (!isCardStackableWith(stackOfCardsToMove[i], stackOfCardsToMove[i - 1])) {
             return false;
@@ -127,7 +126,7 @@ export const removeCard = (board: DealtCards, stacks: CardsStacks | undefined, b
     }
 };
 
-export const moveCardToColumn = (board: DealtCards, card: Card | undefined, targetColmunIndex: number): void => {
+export const moveCardToColumn = (board: DealtCards, buffers: CardsBuffers, stacks: CardsStacks, card: Card | undefined, targetColmunIndex: number): void => {
     if (!board[targetColmunIndex] ||
         !card) {
         return;

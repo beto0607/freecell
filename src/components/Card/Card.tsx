@@ -1,5 +1,5 @@
-import { useAppSelector } from '../../app/hooks';
-import { selectSelectedCard } from '../../features/gameboard/GameboardSlice';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { deselectCard, selectCard, selectSelectedCard } from '../../features/gameboard/GameboardSlice';
 import { Card, CardColor } from '../../models/cards';
 import cardStyles from '../../styles/card.module.css';
 import { compareCards, getCardColorFor, getCardValue, getIconFor } from '../../utils/card.utils';
@@ -12,6 +12,7 @@ interface CardComponentProps {
 }
 
 export const CardComponent = ({ card, onClick }: CardComponentProps) => {
+    const dispatch = useAppDispatch();
     const selectedCard = useAppSelector(selectSelectedCard);
     const cardColor = getCardColorFor(card);
     const colorClass = cardColor === CardColor.Black ? cardStyles.black : cardStyles.red;
@@ -22,6 +23,14 @@ export const CardComponent = ({ card, onClick }: CardComponentProps) => {
 
 
     const onCardClicked = () => {
+        if (compareCards(card, selectedCard)) {
+            dispatch(deselectCard());
+            return;
+        }
+        if (!selectedCard) {
+            dispatch(selectCard(card));
+            return;
+        }
         onClick?.(card);
     };
 

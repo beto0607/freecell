@@ -46,6 +46,9 @@ export const gameboardSlice = createSlice({
             state.board = dealCards(deck);
             state.boardInitialized = true;
         },
+        deselectCard: (state) => {
+            state.selectedCard = undefined;
+        },
         selectCard: (state, action: PayloadAction<Card | undefined>) => {
             if (!state.selectedCard) {
                 state.selectedCard = action.payload;
@@ -59,10 +62,9 @@ export const gameboardSlice = createSlice({
             if (targetColumnIndex === -1) {
                 return;
             }
-            const canPutCardInColumn = isCardMovableToColumn(state.board, state.selectedCard, targetColumnIndex);
-            console.log(targetColumnIndex, state.selectedCard, action.payload);
+            const canPutCardInColumn = isCardMovableToColumn(state.board, state.buffers, state.selectedCard, targetColumnIndex);
             if (canPutCardInColumn) {
-                moveCardToColumn(state.board, state.selectedCard, targetColumnIndex);
+                moveCardToColumn(state.board, state.buffers, state.stacks, state.selectedCard, targetColumnIndex);
                 state.selectedCard = undefined;
                 return;
             }
@@ -81,6 +83,7 @@ export const gameboardSlice = createSlice({
                 state.buffers[bufferId] = state.selectedCard;
                 removeCard(state.board, state.stacks, undefined, state.selectedCard);
             }
+            state.selectedCard = card;
         },
         stackClicked: (state, { payload: { stackId } }: PayloadAction<{ stackId: CardsStacksKeys, card: Card | undefined }>) => {
             const card = state.stacks[stackId].at(-1);
@@ -100,7 +103,7 @@ export const gameboardSlice = createSlice({
     },
 });
 
-export const { initNewGame, selectCard, bufferClicked, stackClicked } = gameboardSlice.actions;
+export const { initNewGame, deselectCard, selectCard, bufferClicked, stackClicked } = gameboardSlice.actions;
 
 export const selectBoardInitialized = ({ gameboard }: RootState) => gameboard.boardInitialized;
 export const selectStacks = ({ gameboard }: RootState) => gameboard.stacks;
