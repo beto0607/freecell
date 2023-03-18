@@ -57,3 +57,18 @@ export const compareCards = <C extends Card | undefined>(aCard: C, anotherCard: 
         aCard?.number === anotherCard?.number;
 }
 
+export const isCardStackableWith = (sourceCard: Card | undefined, targetCard: Card | undefined): boolean => {
+    if (!sourceCard || !targetCard) {
+        return false;
+    }
+
+    const sourceCardColor = getCardColorFor(sourceCard);
+    const targetCardColor = getCardColorFor(targetCard);
+
+    if (sourceCardColor === CardColor.Invalid || targetCardColor === CardColor.Invalid) {
+        return false;
+    }
+
+    return sourceCardColor !== targetCardColor &&
+        sourceCard.number + 1 === targetCard.number;
+};

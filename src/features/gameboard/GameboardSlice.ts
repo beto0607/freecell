@@ -2,7 +2,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import { Card, CardsBuffers, CardsBuffersKeys, CardsStacks, CardsStacksKeys, CardSuit, DealtCards } from "../../models/cards";
 import { compareCards } from "../../utils/card.utils";
-import { dealCards, initDeck, isCardMovableToBuffer, isCardMovableToStack, removeCard } from "../../utils/gameboard.utils";
+import { getColumnIndexForCard } from "../../utils/column.utils";
+import { dealCards, initDeck, isCardMovableToBuffer, isCardMovableToColumn, isCardMovableToStack, moveCardToColumn, removeCard } from "../../utils/gameboard.utils";
 
 export interface GameboardState {
     stacks: CardsStacks;
@@ -46,7 +47,22 @@ export const gameboardSlice = createSlice({
             state.boardInitialized = true;
         },
         selectCard: (state, action: PayloadAction<Card | undefined>) => {
+            if (!state.selectedCard) {
+                state.selectedCard = action.payload;
+                return;
+            }
             if (compareCards(action.payload, state.selectedCard)) {
+                state.selectedCard = undefined;
+                return;
+            }
+            const targetColumnIndex = getColumnIndexForCard(state.board, action.payload);
+            if (targetColumnIndex === -1) {
+                return;
+            }
+            const canPutCardInColumn = isCardMovableToColumn(state.board, state.selectedCard, targetColumnIndex);
+            console.log(targetColumnIndex, state.selectedCard, action.payload);
+            if (canPutCardInColumn) {
+                moveCardToColumn(state.board, state.selectedCard, targetColumnIndex);
                 state.selectedCard = undefined;
                 return;
             }

@@ -1,5 +1,5 @@
 import { Card, CardColor, CardSuit } from '../models/cards';
-import { cardToString, CLUB_ICON, compareCards, DIAMOD_ICON, getCardColorFor, getCardColorForSuit, getCardValue, getIconFor, getIconForSuit, HEART_ICON, SPADE_ICON } from './card.utils';
+import { cardToString, CLUB_ICON, compareCards, DIAMOD_ICON, getCardColorFor, getCardColorForSuit, getCardValue, getIconFor, getIconForSuit, HEART_ICON, isCardStackableWith, SPADE_ICON } from './card.utils';
 
 
 const mockCard: Card = {
@@ -8,6 +8,47 @@ const mockCard: Card = {
 };
 
 describe('card utils', () => {
+    describe('isCardStackableWith', () => {
+        const targetCard: Card = {
+            number: 2,
+            suit: CardSuit.Heart
+        };
+
+        const sourceCard: Card = {
+            number: 1,
+            suit: CardSuit.Spade,
+        };
+
+        it('should return false - undefined', () => {
+            expect(isCardStackableWith(undefined, undefined)).toBe(false);
+            expect(isCardStackableWith(mockCard, undefined)).toBe(false);
+            expect(isCardStackableWith(undefined, mockCard)).toBe(false);
+        });
+
+        it('should return false - same card', () => {
+            expect(isCardStackableWith(mockCard, mockCard)).toBe(false);
+        });
+
+        it('should return false - same color', () => {
+            expect(isCardStackableWith(sourceCard, { ...targetCard, suit: sourceCard.suit })).toBe(false);
+        });
+
+        it('should return false - invalid color', () => {
+            expect(isCardStackableWith(mockCard, targetCard)).toBe(false);
+            expect(isCardStackableWith(sourceCard, mockCard)).toBe(false);
+        });
+
+        it('should return false - invalid number', () => {
+            expect(isCardStackableWith(sourceCard, { ...targetCard, number: 13 })).toBe(false);
+            expect(isCardStackableWith(sourceCard, { ...targetCard, number: sourceCard.number })).toBe(false);
+            expect(isCardStackableWith({ ...sourceCard, number: 5 }, { ...targetCard, number: 4 })).toBe(false);
+        });
+
+        it('should return true', () => {
+            expect(isCardStackableWith(sourceCard, targetCard)).toBe(true);
+            expect(isCardStackableWith({ ...sourceCard, number: 12 }, { ...targetCard, number: 13 })).toBe(true);
+        });
+    });
     describe('getCardValue', () => {
         it('should return undefined when undefined card', () => {
             const cardValue = getCardValue(undefined);

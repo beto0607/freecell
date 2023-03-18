@@ -21,7 +21,7 @@ export interface Card {
 
 export type Deck = Array<Card>;
 
-export type DealtCards = Array<Array<Card>>; // 6 columns of 8/9 cards each
+export type DealtCards = Array<Array<Card>>; // 8 columns of 6/7 cards each
 
 export type CardsBuffers = {
     0: Card | undefined,
