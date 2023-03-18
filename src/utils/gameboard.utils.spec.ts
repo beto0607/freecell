@@ -1,6 +1,6 @@
 import { Card, CardSuit, DealtCards } from '../models/cards.d';
 import { columnContainsCard } from './column.utils';
-import { isCardMovableToColumn, moveCardToColumn, removeCard } from './gameboard.utils';
+import { isCardMovableToColumn, isSingleCardSelection, moveCardToColumn, removeCardFromBoard } from './gameboard.utils';
 import { dealCards, initDeck } from './deck.utils';
 
 describe('gameboard utils', () => {
@@ -120,9 +120,9 @@ describe('gameboard utils', () => {
                 expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(true);
             });
         });
-        
+
         describe('multiple cards', () => {
-            it('should return false - random cards', () => { 
+            it('should return false - random cards', () => {
                 let card = dealtCards[0][1];
                 expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(false);
             });
@@ -182,15 +182,37 @@ describe('gameboard utils', () => {
     describe('removeCard', () => {
         it('shouldn\´t remove card - undefined', () => {
             const columnLength = dealtCards[1].length;
-            removeCard(dealtCards, undefined);
+            removeCardFromBoard(dealtCards, undefined);
             expect(dealtCards[1]).toHaveLength(columnLength);
         });
 
         it('should remove card', () => {
             const columnLength = dealtCards[1].length;
-            removeCard(dealtCards, dealtCards[1][0]);
+            removeCardFromBoard(dealtCards, dealtCards[1][0]);
             expect(dealtCards[1]).toHaveLength(columnLength - 1);
         });
     });
+
+    describe('isSingleCardSelection', () => {
+
+        it('should return true', () => {
+            expect(isSingleCardSelection(dealtCards, dealtCards[0].at(-1))).toBe(true)
+        });
+
+        it('should return false - undefined card', () => {
+            expect(isSingleCardSelection(dealtCards, undefined)).toBe(false)
+        });
+
+        it('should return false - card not found', () => {
+            const card = dealtCards[0].pop();
+            expect(isSingleCardSelection(dealtCards, card)).toBe(false)
+        });
+
+        it('should return false - card not at end', () => {
+            const card = dealtCards[0][1];
+            expect(isSingleCardSelection(dealtCards, card)).toBe(false)
+        });
+    });
+
 });
 

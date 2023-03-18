@@ -1,7 +1,6 @@
-import { Card, CardsBuffers, CardsStacks, DealtCards } from "../models/cards";
-import { BUFFER_KEYS } from "./buffers.utils";
+import { Card, DealtCards } from "../models/cards.d";
 import { compareCards, isCardStackableWith } from "./card.utils";
-import { getCardIndexInColumn, getColumnIndexForCard } from "./column.utils";
+import { getCardIndexInColumn, getColumnIndexForCard, isLastCardForColumn } from "./column.utils";
 
 
 export const moveCardToColumn = (board: DealtCards, card: Card | undefined, targetColmunIndex: number): void => {
@@ -55,7 +54,7 @@ export const isCardMovableToColumn = (board: DealtCards, card: Card | undefined,
         isCardStackableWith(stackOfCardsToMove[0], targetColumn.at(-1));
 };
 
-export const removeCard = (board: DealtCards, card: Card | undefined): void => {
+export const removeCardFromBoard = (board: DealtCards, card: Card | undefined): void => {
     if (!card) {
         return;
     }
@@ -68,3 +67,9 @@ export const removeCard = (board: DealtCards, card: Card | undefined): void => {
     }
 };
 
+export const isSingleCardSelection = (board: DealtCards, card: Card | undefined): boolean=> {
+    if (!card) {
+        return false;
+    }
+    return board.some((column) => isLastCardForColumn(column, card));
+};
