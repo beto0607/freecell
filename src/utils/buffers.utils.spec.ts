@@ -1,5 +1,6 @@
-import { Card, CardsBuffers, CardsBuffersKeys, CardSuit } from "../models/cards.d";
-import { getBufferIndexForCard, isCardInBuffers, isCardMovableToBuffer, removeCardFromBuffers } from "./buffers.utils";
+import { buffer } from "stream/consumers";
+import { Card, CardsBuffers, CardSuit } from "../models/cards.d";
+import { BUFFER_KEYS, getBufferIndexForCard, getFreeBuffer, isCardInBuffers, isCardMovableToBuffer, removeCardFromBuffers } from "./buffers.utils";
 
 describe('buffer utils', () => {
     const mockCard: Card = {
@@ -69,9 +70,6 @@ describe('buffer utils', () => {
 
     describe('isCardMovableToBuffer', () => {
 
-        it('should return false - buffer undefined', () => {
-            expect(isCardMovableToBuffer(buffers, -1 as unknown as CardsBuffersKeys, mockCard)).toBe(false);
-        })
         it('should return false - card undefined', () => {
             expect(isCardMovableToBuffer(buffers, 0, undefined)).toBe(false);
         })
@@ -85,5 +83,21 @@ describe('buffer utils', () => {
             buffers[0] = mockCard;
             expect(isCardMovableToBuffer(buffers, 1, mockCard)).toBe(true);
         })
+    });
+
+    describe('getFreeBuffer', () => {
+        it('should return first key', () => {
+            expect(getFreeBuffer(buffers)).toBe(BUFFER_KEYS.at(0));
+        });
+
+        it('should return last key', () => {
+            buffers[0] = buffers[1] = buffers[2] = mockCard;
+            expect(getFreeBuffer(buffers)).toBe(BUFFER_KEYS.at(-1));
+        });
+
+        it('should return undefined', () => {
+            buffers[0] = buffers[1] = buffers[2] = buffers[3] = mockCard;
+            expect(getFreeBuffer(buffers)).toBeUndefined();
+        });
     });
 });

@@ -1,4 +1,4 @@
-import { Card, CardsBuffers, CardsBuffersKeys, CardsStacks, DealtCards } from "../models/cards";
+import { Card, CardsBuffers, CardsBuffersKeys } from "../models/cards.d";
 import { compareCards } from "./card.utils";
 
 export const BUFFER_KEYS: CardsBuffersKeys[] = [0, 1, 2, 3];
@@ -21,9 +21,9 @@ export const isCardMovableToBuffer = (buffers: CardsBuffers, bufferId: CardsBuff
     if (!card) {
         return false;
     }
-    if (!(bufferId in buffers)) {
-        return false;
-    }
     return !buffers[bufferId];
 };
+
+export const getFreeBuffer = (buffers: CardsBuffers): CardsBuffersKeys | undefined =>
+    BUFFER_KEYS.find((key) => !buffers[key])
 
