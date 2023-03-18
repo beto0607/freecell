@@ -1,5 +1,5 @@
-import { Card, CardsBuffers, CardSuit } from "../models/cards";
-import { getBufferIndexForCard, isCardInBuffers, removeCardFromBuffers } from "./buffers.utils";
+import { Card, CardsBuffers, CardsBuffersKeys, CardSuit } from "../models/cards.d";
+import { getBufferIndexForCard, isCardInBuffers, isCardMovableToBuffer, removeCardFromBuffers } from "./buffers.utils";
 
 describe('buffer utils', () => {
     const mockCard: Card = {
@@ -16,6 +16,22 @@ describe('buffer utils', () => {
             2: undefined,
             3: undefined,
         }
+    });
+
+    describe('isCardInBuffers', () => {
+
+        it('should return false - no card in buffer', () => {
+            expect(isCardInBuffers(buffers, mockCard)).toBe(false);
+        });
+
+        it('should return false - undefined card', () => {
+            expect(isCardInBuffers(buffers, undefined)).toBe(false);
+        });
+
+        it('should return true', () => {
+            buffers[3] = mockCard;
+            expect(isCardInBuffers(buffers, mockCard)).toBe(true);
+        });
     });
 
     describe('getBufferIndexForCard', () => {
@@ -35,22 +51,6 @@ describe('buffer utils', () => {
         });
     });
 
-    describe('isCardInBuffers', () => {
-
-        it('should return false - no card in buffer', () => {
-            expect(isCardInBuffers(buffers, mockCard)).toBe(false);
-        });
-
-        it('should return false - undefined card', () => {
-            expect(isCardInBuffers(buffers, undefined)).toBe(false);
-        });
-
-        it('should return true', () => {
-            buffers[3] = mockCard;
-            expect(isCardInBuffers(buffers, mockCard)).toBe(true);
-        });
-    });
-
     describe('removeCardFromBuffers', () => {
         it('should remove card from buffers', () => {
             buffers[0] = mockCard;
@@ -65,5 +65,25 @@ describe('buffer utils', () => {
             removeCardFromBuffers(buffers, mockCard);
             expect(buffers[0]).not.toBeUndefined();
         });
+    });
+
+    describe('isCardMovableToBuffer', () => {
+
+        it('should return false - buffer undefined', () => {
+            expect(isCardMovableToBuffer(buffers, -1 as unknown as CardsBuffersKeys, mockCard)).toBe(false);
+        })
+        it('should return false - card undefined', () => {
+            expect(isCardMovableToBuffer(buffers, 0, undefined)).toBe(false);
+        })
+
+        it('should return false - buffer occupied', () => {
+            buffers[0] = mockCard;
+            expect(isCardMovableToBuffer(buffers, 0, mockCard)).toBe(false);
+        })
+
+        it('should return true', () => {
+            buffers[0] = mockCard;
+            expect(isCardMovableToBuffer(buffers, 1, mockCard)).toBe(true);
+        })
     });
 });

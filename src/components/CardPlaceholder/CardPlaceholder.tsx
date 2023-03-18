@@ -1,4 +1,4 @@
-import { Card, CardColor, CardSuit } from "../../models/cards";
+import { Card, CardColor, CardSuit } from "../../models/cards.d";
 import { getCardColorForSuit, getIconForSuit } from "../../utils/card.utils";
 import { CardComponent } from "../Card/Card";
 import styles from './CardPlaceholder.module.css';

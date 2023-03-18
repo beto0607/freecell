@@ -1,4 +1,4 @@
-import { Card, CardSuit, DealtCards, Deck } from "../models/cards";
+import { Card, CardSuit, DealtCards, Deck } from "../models/cards.d";
 import { shuffleArray } from "./array.utils";
 
 export const CARD_SUITS = [CardSuit.Spade, CardSuit.Diamond, CardSuit.Club, CardSuit.Heart];

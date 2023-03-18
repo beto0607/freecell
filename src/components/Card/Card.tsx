@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { deselectCard, selectCard, selectSelectedCard } from '../../features/gameboard/GameboardSlice';
-import { Card, CardColor } from '../../models/cards';
+import { Card, CardColor } from '../../models/cards.d';
 import cardStyles from '../../styles/card.module.css';
 import { compareCards, getCardColorFor, getCardValue, getIconFor } from '../../utils/card.utils';
 import { classes } from '../../utils/style.utils';

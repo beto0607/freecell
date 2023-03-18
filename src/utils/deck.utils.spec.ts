@@ -1,4 +1,4 @@
-import { CardSuit, DealtCards, Deck } from '../models/cards';
+import { CardSuit, DealtCards, Deck } from '../models/cards.d';
 import { dealCards, initDeck } from './deck.utils';
 
 describe('deckUtils', () => {

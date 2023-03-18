@@ -1,4 +1,4 @@
-import { Card, CardColor, CardSuit } from '../models/cards';
+import { Card, CardColor, CardSuit } from '../models/cards.d';
 import { cardToString, CLUB_ICON, compareCards, DIAMOD_ICON, getCardColorFor, getCardColorForSuit, getCardValue, getIconFor, getIconForSuit, HEART_ICON, isCardStackableWith, SPADE_ICON } from './card.utils';
 
 

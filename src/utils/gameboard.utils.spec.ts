@@ -1,16 +1,24 @@
-import { Card, CardSuit, DealtCards } from '../models/cards';
+import { Card, CardSuit, DealtCards } from '../models/cards.d';
 import { columnContainsCard } from './column.utils';
-import { isCardMovableToColumn, moveCardToColumn } from './gameboard.utils';
+import { isCardMovableToColumn, moveCardToColumn, removeCard } from './gameboard.utils';
 import { dealCards, initDeck } from './deck.utils';
 
 describe('gameboard utils', () => {
+    let dealtCards: DealtCards;
+    beforeEach(() => {
+        const initialDeck = initDeck();
+        dealtCards = dealCards(initialDeck);
+    });
+
     describe('moveCardToColmun', () => {
-        let dealtCards: DealtCards;
         const targetColumnIndex = 3;
 
-        beforeEach(() => {
-            const initialDeck = initDeck();
-            dealtCards = dealCards(initialDeck);
+
+        it('should move card when it comes from stack/buffers - checkSource === false', () => {
+            const card: Card = dealtCards[1][0];
+            dealtCards[1] = [];
+            moveCardToColumn(dealtCards, card, 0);
+            expect(columnContainsCard(dealtCards[0], card)).toBe(true);
         });
 
         it('should move a card from a column to another', () => {
@@ -41,23 +49,9 @@ describe('gameboard utils', () => {
             moveCardToColumn(dealtCards, card, -1)
             expect(columnContainsCard(dealtCards[0], card)).toBeTruthy();
         });
-
-        it('should not move card that aren\'t in the board', () => {
-            const card = dealtCards[0].pop(); // pop removes the card from the board
-            moveCardToColumn(dealtCards, card, 3);
-            expect(columnContainsCard(dealtCards[0], card)).toBeFalsy();
-            expect(columnContainsCard(dealtCards[3], card)).toBeFalsy();
-        });
     });
 
     describe('isCardMovableToColumn', () => {
-        let dealtCards: DealtCards;
-
-        beforeEach(() => {
-            const initialDeck = initDeck();
-            dealtCards = dealCards(initialDeck);
-        });
-
         describe('invalid cards', () => {
             it('should return false - undefined card', () => {
                 expect(isCardMovableToColumn(dealtCards, undefined, 3)).toBe(false);
@@ -126,54 +120,76 @@ describe('gameboard utils', () => {
                 expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(true);
             });
         });
-        it('should return true - many cards in column', () => {
-            dealtCards = [
-                [
-                    {
-                        number: 9,
-                        suit: CardSuit.Club,
-                    },
-                    {
-                        number: 11,
-                        suit: CardSuit.Heart
-                    },
-                    {
-                        number: 10,
-                        suit: CardSuit.Spade
-                    },
-                ],
-                [
-                    {
-                        number: 12,
-                        suit: CardSuit.Club,
-                    },
-                ],
-            ];
-            let card = dealtCards[0][1];
-            expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(true);
-            card = dealtCards[0][2];
-            expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(false);
+        
+        describe('multiple cards', () => {
+            it('should return false - random cards', () => { 
+                let card = dealtCards[0][1];
+                expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(false);
+            });
+
+            it('should return true - many cards in column', () => {
+                dealtCards = [
+                    [
+                        {
+                            number: 9,
+                            suit: CardSuit.Club,
+                        },
+                        {
+                            number: 11,
+                            suit: CardSuit.Heart
+                        },
+                        {
+                            number: 10,
+                            suit: CardSuit.Spade
+                        },
+                    ],
+                    [
+                        {
+                            number: 12,
+                            suit: CardSuit.Club,
+                        },
+                    ],
+                ];
+                let card = dealtCards[0][1];
+                expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(true);
+                card = dealtCards[0][2];
+                expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(false);
+            });
+
+            it('should return true - empty target', () => {
+                dealtCards = [
+                    [
+                        {
+                            number: 2,
+                            suit: CardSuit.Heart
+                        },
+                        {
+                            number: 1,
+                            suit: CardSuit.Spade
+                        },
+                    ],
+                    [
+                    ],
+                ];
+                let card = dealtCards[0][1];
+                expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(true);
+                card = dealtCards[0][0];
+                expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(true);
+            });
+        });
+    });
+
+    describe('removeCard', () => {
+        it('shouldn\´t remove card - undefined', () => {
+            const columnLength = dealtCards[1].length;
+            removeCard(dealtCards, undefined);
+            expect(dealtCards[1]).toHaveLength(columnLength);
         });
 
-        it('should return true - empty target', () => {
-            dealtCards = [
-                [
-                    {
-                        number: 2,
-                        suit: CardSuit.Heart
-                    },
-                    {
-                        number: 1,
-                        suit: CardSuit.Spade
-                    },
-                ],
-                [
-                ],
-            ];
-            let card = dealtCards[0][1];
-            expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(true);
-            card = dealtCards[0][0];
-            expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(true);
+        it('should remove card', () => {
+            const columnLength = dealtCards[1].length;
+            removeCard(dealtCards, dealtCards[1][0]);
+            expect(dealtCards[1]).toHaveLength(columnLength - 1);
         });
     });
 });

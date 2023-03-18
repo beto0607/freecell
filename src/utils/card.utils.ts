@@ -1,4 +1,4 @@
-import { Card, CardColor, CardSuit, CardValue } from "../models/cards";
+import { Card, CardColor, CardSuit, CardValue } from "../models/cards.d";
 
 export const CARD_VALUES: CardValue[] = ['A', 2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K'];
 export const CLUB_ICON = "♣";

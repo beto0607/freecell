@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-import { Card, CardsBuffers, CardsBuffersKeys, CardsStacks, CardsStacksKeys, CardSuit, DealtCards } from "../../models/cards";
-import { isCardInBuffers, isCardMovableToBuffer, moveCardToColumnFromBuffers } from "../../utils/buffers.utils";
+import { Card, CardsBuffers, CardsBuffersKeys, CardsStacks, CardsStacksKeys, CardSuit, DealtCards } from "../../models/cards.d";
+import { isCardInBuffers, isCardMovableToBuffer, removeCardFromBuffers } from "../../utils/buffers.utils";
 import { compareCards } from "../../utils/card.utils";
 import { getColumnIndexForCard } from "../../utils/column.utils";
 import { dealCards, initDeck } from '../../utils/deck.utils';
 import { isCardMovableToColumn, moveCardToColumn, removeCard } from "../../utils/gameboard.utils";
-import { isCardInStacks, isCardMovableToStack, moveCardToColumnFromStacks } from "../../utils/stacks.utils";
+import { isCardInStacks, isCardMovableToStack, removeCardFromStacks } from "../../utils/stacks.utils";
 
 export interface GameboardState {
     stacks: CardsStacks;
@@ -68,14 +68,16 @@ export const gameboardSlice = createSlice({
 
             if (isCardInBuffers(state.buffers, state.selectedCard)) {
                 if (isCardMovableToColumn(state.board, state.selectedCard, targetColumnIndex)) {
-                    moveCardToColumnFromBuffers(state.board, state.buffers, state.selectedCard, targetColumnIndex);
+                    moveCardToColumn(state.board, state.selectedCard, targetColumnIndex);
+                    removeCardFromBuffers(state.buffers, state.selectedCard);
                 };
                 state.selectedCard = action.payload;
                 return;
             }
             if (isCardInStacks(state.stacks, state.selectedCard)) {
                 if (isCardMovableToColumn(state.board, state.selectedCard, targetColumnIndex)) {
-                    moveCardToColumnFromStacks(state.board, state.stacks, state.selectedCard, targetColumnIndex);
+                    moveCardToColumn(state.board, state.selectedCard, targetColumnIndex);
+                    removeCardFromStacks(state.stacks, state.selectedCard);
                 }
                 state.selectedCard = action.payload;
                 return;
@@ -98,9 +100,9 @@ export const gameboardSlice = createSlice({
                 state.selectedCard = undefined;
                 return;
             }
-            if (!state.buffers[bufferId] && isCardMovableToBuffer(state.board, state.stacks, state.selectedCard)) {
+            if (isCardMovableToBuffer(state.buffers, bufferId, state.selectedCard)) {
                 state.buffers[bufferId] = state.selectedCard;
-                removeCard(state.board, state.stacks, undefined, state.selectedCard);
+                removeCard(state.board, state.selectedCard);
             }
             state.selectedCard = card;
         },
@@ -114,9 +116,9 @@ export const gameboardSlice = createSlice({
                 state.selectedCard = undefined;
                 return;
             }
-            if (isCardMovableToStack(state.board, state.buffers, state.stacks, stackId, state.selectedCard)) {
+            if (isCardMovableToStack(state.stacks, stackId, state.selectedCard)) {
                 state.stacks[stackId]!.push(state.selectedCard);
-                removeCard(state.board, undefined, state.buffers, state.selectedCard);
+                removeCard(state.board, state.selectedCard);
             }
         }
     },

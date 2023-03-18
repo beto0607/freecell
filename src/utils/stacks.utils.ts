@@ -1,4 +1,4 @@
-import { Card, CardsBuffers, CardsStacks, CardsStacksKeys, CardSuit, DealtCards } from "../models/cards";
+import { Card, CardsStacks, CardsStacksKeys, CardSuit, DealtCards } from "../models/cards.d";
 import { compareCards } from "./card.utils";
 
 export const STACK_KEYS: CardsStacksKeys[] = [

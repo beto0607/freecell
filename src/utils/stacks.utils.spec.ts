@@ -1,4 +1,4 @@
-import { Card, CardsStacks, CardSuit, DealtCards } from "../models/cards";
+import { Card, CardsStacks, CardSuit, DealtCards } from "../models/cards.d";
 import { dealCards, initDeck } from "./deck.utils";
 import { initStacks, isCardInStack, isCardInStacks, isCardMovableToStack, moveCardToColumnFromStacks, removeCardFromStacks } from "./stacks.utils";
 

@@ -17,24 +17,13 @@ export const removeCardFromBuffers = (buffers: CardsBuffers, card: Card | undefi
     }
 };
 
-export const isCardMovableToBuffer = (board: DealtCards, stacks: CardsStacks, card: Card | undefined): boolean => {
+export const isCardMovableToBuffer = (buffers: CardsBuffers, bufferId: CardsBuffersKeys, card: Card | undefined): boolean => {
     if (!card) {
         return false;
     }
-    return (
-        Object.values(stacks).some((stack) => compareCards(card, stack.at(-1))) ||
-        board.some((column) => compareCards(card, column.at(-1)))
-    );
-};
-
-export const moveCardToColumnFromBuffers = (board: DealtCards, buffers: CardsBuffers, card: Card | undefined, targetColmunIndex: number): void => {
-    if (
-        !board[targetColmunIndex] ||
-        !card
-    ) {
-        return;
+    if (!(bufferId in buffers)) {
+        return false;
     }
-    board[targetColmunIndex].push(card);
-    removeCardFromBuffers(buffers, card);
-}
+    return !buffers[bufferId];
+};
 
