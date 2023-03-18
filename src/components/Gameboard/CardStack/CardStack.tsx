@@ -5,6 +5,7 @@ import { STACK_KEYS } from "../../../utils/stacks.utils";
 import { CardPlaceholderComponent } from "../../CardPlaceholder/CardPlaceholder";
 import styles from './CardStack.module.css';
 
+// Real name of this area: "Foundation"
 export const CardStackComponent = () => {
     const dispatch = useAppDispatch();
     const cardStack = useAppSelector(selectStacks);

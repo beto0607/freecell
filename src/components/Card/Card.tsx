@@ -9,9 +9,11 @@ import styles from './Card.module.css';
 interface CardComponentProps {
     card: Card;
     onClick?: (card: Card) => void;
+    onDoubleClick?: (card: Card) => void;
 }
+var doubleClick = false;
 
-export const CardComponent = ({ card, onClick }: CardComponentProps) => {
+export const CardComponent = ({ card, onClick, onDoubleClick }: CardComponentProps) => {
     const selectedCard = useAppSelector(selectSelectedCard);
     const cardColor = getCardColorFor(card);
     const colorClass = cardColor === CardColor.Black ? cardStyles.black : cardStyles.red;
@@ -21,12 +23,29 @@ export const CardComponent = ({ card, onClick }: CardComponentProps) => {
     const classNames = classes(styles.wrapper, colorClass, selectedClass);
 
 
-    const onCardClicked = () => {
-        onClick?.(card);
+    const onCardClicked = (): void => {
+        if (doubleClick) {
+            return;
+        }
+        // TODO: remove this hack
+        setTimeout(() => {
+            if (doubleClick) {
+                setTimeout(() => {
+                    doubleClick = false;
+                }, 200);
+                return;
+            }
+            onClick?.(card);
+        }, 200);
+    };
+
+    const onCardDoubleClicked = () => {
+        doubleClick = true;
+        onDoubleClick?.(card);
     };
 
     return (
-        <div className={classNames} onClick={onCardClicked}>
+        <div className={classNames} onClick={onCardClicked} onDoubleClick={onCardDoubleClicked}>
             <CardNameComponent card={card} isBottom={false} />
             <div className={styles.figure}>
             </div>

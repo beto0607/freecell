@@ -4,19 +4,12 @@ import { CardsBuffers } from "../../../models/cards.d";
 import { CardPlaceholderComponent } from "../../CardPlaceholder/CardPlaceholder";
 import styles from './CardBuffer.module.css';
 
+// Real name of this area: "Free celle"
 export const CardBufferComponent = () => {
     const dispatch = useAppDispatch();
     const cardBuffer = useAppSelector(selectBuffers);
     const selectedCard = useAppSelector(selectSelectedCard);
     const onBufferClicked = (bufferId: keyof CardsBuffers) => {
-        // if (compareCards(card, selectedCard)) {
-        //     dispatch(deselectCard());
-        //     return;
-        // }
-        // if (!selectedCard) {
-        //     dispatch(selectCard(card));
-        //     return;
-        // }
         dispatch(bufferSelected({ bufferId, card: selectedCard }));
     };
 

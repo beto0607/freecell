@@ -1,11 +1,12 @@
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
-import { selectBoard, selectCard, selectSelectedCard } from "../../../features/gameboard/GameboardSlice";
+import { moveCard, selectBoard, selectCard, selectSelectedCard } from "../../../features/gameboard/GameboardSlice";
 import { Card } from "../../../models/cards";
 import { cardToString, compareCards } from "../../../utils/card.utils";
 import { classes } from "../../../utils/style.utils";
 import { CardComponent } from "../../Card/Card";
 import styles from './Board.module.css';
 
+// Real name of this area: "tableau"
 export const BoardComponent = () => {
     const cardsBoard = useAppSelector(selectBoard);
     const selectedCard = useAppSelector(selectSelectedCard);
@@ -29,6 +30,9 @@ const BoardColumnComponent = ({ cards, selectedCard }: CardsColumnComponentProps
     const onCardClicked = (card: Card) => {
         dispatch(selectCard({ card }));
     };
+    const onCardDoubleClicked = (card: Card) => {
+        dispatch(moveCard({ card }));
+    };
     return (
         <div className={styles.column}>
             {cards
@@ -37,7 +41,7 @@ const BoardColumnComponent = ({ cards, selectedCard }: CardsColumnComponentProps
                     const classNames = classes(styles['column-item'], selected ? styles['selected'] : '');
                     return (
                         <div className={classNames} key={cardToString(card)}>
-                            <CardComponent card={card} onClick={onCardClicked} />
+                            <CardComponent card={card} onClick={onCardClicked} onDoubleClick={onCardDoubleClicked} />
                         </div>);
                 })}
         </div>

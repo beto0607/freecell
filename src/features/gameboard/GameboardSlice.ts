@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { stat } from "fs";
 import { RootState } from "../../app/store";
 import { Card, CardsBuffers, CardsBuffersKeys, CardsStacks, CardsStacksKeys, CardSuit, DealtCards } from "../../models/cards.d";
-import { isCardInBuffers, isCardMovableToBuffer, removeCardFromBuffers } from "../../utils/buffers.utils";
+import { getFreeBuffer, isCardInBuffers, isCardMovableToBuffer, removeCardFromBuffers } from "../../utils/buffers.utils";
 import { compareCards } from "../../utils/card.utils";
 import { getColumnIndexForCard } from "../../utils/column.utils";
 import { dealCards, initDeck } from '../../utils/deck.utils';
@@ -95,6 +95,10 @@ export const gameboardSlice = createSlice({
                 return;
             }
             state.selectedCard = card;
+            const canBeMovedFromBoard = isSingleCardSelection(state.board, card);
+            if (!canBeMovedFromBoard) {
+                return;
+            }
             const stackId = card.suit as CardsStacksKeys;
             if (
                 !isCardInStacks(state.stacks, state.selectedCard) &&
@@ -103,6 +107,16 @@ export const gameboardSlice = createSlice({
                 removeCardFromBuffers(state.buffers, state.selectedCard);
                 removeCardFromBoard(state.board, state.selectedCard);
                 state.stacks[stackId]!.push(state.selectedCard);
+                return;
+            }
+            const freeBuffer = getFreeBuffer(state.buffers);
+            if (
+                !isCardInBuffers(state.buffers, state.selectedCard) &&
+                typeof freeBuffer !== "undefined"
+            ) {
+                removeCardFromStacks(state.stacks, state.selectedCard);
+                removeCardFromBoard(state.board, state.selectedCard);
+                state.buffers[freeBuffer] = state.selectedCard;
             }
         },
         bufferSelected: (state, { payload: { bufferId, card } }: PayloadAction<{ bufferId: CardsBuffersKeys, card: Card | undefined }>) => {
@@ -159,7 +173,7 @@ export const gameboardSlice = createSlice({
     },
 });
 
-export const { initNewGame, selectCard, bufferSelected, stackSelected } = gameboardSlice.actions;
+export const { initNewGame, selectCard, bufferSelected, stackSelected, moveCard } = gameboardSlice.actions;
 
 export const selectBoardInitialized = ({ gameboard }: RootState) => gameboard.boardInitialized;
 export const selectStacks = ({ gameboard }: RootState) => gameboard.stacks;
