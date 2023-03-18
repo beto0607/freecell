@@ -10,3 +10,6 @@ export const getCardIndexInColumn = (column: Array<Card>, card: Card | undefined
 export const columnContainsCard = (column: Card[], card: Card | undefined): boolean =>
     getCardIndexInColumn(column, card) !== -1;
 
+export const isLastCardForColumn = (column: Card[], card: Card | undefined): boolean =>
+    !!column?.length &&
+    getCardIndexInColumn(column, card) === column.length - 1;

@@ -1,5 +1,5 @@
-import { Card, DealtCards } from "../models/cards";
-import { columnContainsCard, getCardIndexInColumn, getColumnIndexForCard } from "./column.utils";
+import { Card, DealtCards } from "../models/cards.d";
+import { columnContainsCard, getCardIndexInColumn, getColumnIndexForCard, isLastCardForColumn } from "./column.utils";
 import { dealCards, initDeck } from "./deck.utils";
 
 describe('column utils', () => {
@@ -30,6 +30,7 @@ describe('column utils', () => {
             expect(getCardIndexInColumn(column, card)).toEqual(10);
         })
     });
+
     describe('columnContainsCard', () => {
 
         it('should return false - undefined', () => {
@@ -67,6 +68,25 @@ describe('column utils', () => {
         it('should return 3', () => {
             const card = board[3][0];
             expect(getColumnIndexForCard(board, card)).toBe(3);
+        });
+    });
+
+    describe('isLastCardForColumn', () => {
+
+        it('should return true', () => {
+            expect(isLastCardForColumn(column, column.at(-1))).toBe(true);
+        });
+
+        it('should return false - undefined card', () => {
+            expect(isLastCardForColumn(column, undefined)).toBe(false);
+        });
+
+        it('should return false - empty column', () => {
+            expect(isLastCardForColumn([], column[0])).toBe(false);
+        });
+        it('should return false - card not found', () => {
+            const card = column.pop();
+            expect(isLastCardForColumn(column, card)).toBe(false);
         });
     });
 });
