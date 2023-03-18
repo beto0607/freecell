@@ -1,41 +1,8 @@
-import { Card, CardsBuffers, CardsBuffersKeys, CardsStacks, CardsStacksKeys, CardSuit, DealtCards, Deck } from "../models/cards";
-import { shuffleArray } from "./array.utils";
+import { Card, CardsBuffers, CardsStacks, CardsStacksKeys, DealtCards } from "../models/cards";
+import { BUFFER_KEYS, removeCardFromBuffers } from "./buffers.utils";
 import { compareCards, isCardStackableWith } from "./card.utils";
 import { getCardIndexInColumn, getColumnIndexForCard } from "./column.utils";
-
-
-export const CARD_SUITS = [CardSuit.Spade, CardSuit.Diamond, CardSuit.Club, CardSuit.Heart];
-export const CARD_NUMBERS: Card['number'][] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
-export const COLUMN_COUNT = 8;
-
-export const initDeck = (): Card[] => {
-    const deck: Card[] = []; for (let index = 0; index < 52; index++) {
-        const number: Card['number'] = CARD_NUMBERS[index % 13];
-        const suit = CARD_SUITS[Math.floor(index / 13)];
-        deck.push({
-            suit,
-            number,
-        });
-
-    }
-    return deck;
-};
-
-export const dealCards = (deck: Deck): DealtCards => {
-    const shuffledDeck = shuffleArray(deck);
-    const dealtCards: DealtCards = [];
-
-    for (let i = 0; i < COLUMN_COUNT; i++) {
-        dealtCards.push([]);
-    }
-
-    for (let index = 0; index < shuffledDeck.length; index++) {
-        const card = shuffledDeck[index];
-        dealtCards[index % dealtCards.length].push(card);
-    }
-
-    return dealtCards;
-};
+import { removeCardFromStacks } from "./stacks.utils";
 
 // TODO: Add tests
 export const isCardMovableToBuffer = (board: DealtCards, stacks: CardsStacks, card: Card | undefined): boolean => {
@@ -48,7 +15,7 @@ export const isCardMovableToBuffer = (board: DealtCards, stacks: CardsStacks, ca
     );
 };
 
-export const isCardMovableToColumn = (board: DealtCards, buffers: CardsBuffers, card: Card | undefined, targetColmunIndex: number): boolean => {
+export const isCardMovableToColumn = (board: DealtCards, card: Card | undefined, targetColmunIndex: number): boolean => {
     const targetColumn = board[targetColmunIndex];
     if (!card || !targetColumn) {
         return false;
@@ -96,7 +63,6 @@ export const isCardMovableToStack = (board: DealtCards, buffers: CardsBuffers, s
 }
 
 // TODO: Add tests
-// ! Attention, this produces a side effect
 export const removeCard = (board: DealtCards, stacks: CardsStacks | undefined, buffers: CardsBuffers | undefined, card: Card): void => {
     if (stacks) {
         for (const stack of Object.values(stacks)) {
@@ -108,8 +74,7 @@ export const removeCard = (board: DealtCards, stacks: CardsStacks | undefined, b
         }
     }
     if (buffers) {
-        const keys: CardsBuffersKeys[] = [0, 1, 2, 3];
-        for (const key of keys) {
+        for (const key of BUFFER_KEYS) {
             if (!compareCards(buffers[key], card)) {
                 continue;
             }
@@ -126,7 +91,7 @@ export const removeCard = (board: DealtCards, stacks: CardsStacks | undefined, b
     }
 };
 
-export const moveCardToColumn = (board: DealtCards, buffers: CardsBuffers, stacks: CardsStacks, card: Card | undefined, targetColmunIndex: number): void => {
+export const moveCardToColumn = (board: DealtCards, card: Card | undefined, targetColmunIndex: number): void => {
     if (!board[targetColmunIndex] ||
         !card) {
         return;
@@ -144,5 +109,30 @@ export const moveCardToColumn = (board: DealtCards, buffers: CardsBuffers, stack
         ...board[targetColmunIndex],
         ...sourceColumn.slice(cardIndexInColumn, sourceColumn.length)
     ];
+};
+
+// -- Buffers
+export const moveCardToColumnFromBuffers = (board: DealtCards, buffers: CardsBuffers, card: Card | undefined, targetColmunIndex: number): void => {
+    if (
+        !board[targetColmunIndex] ||
+        !card
+    ) {
+        return;
+    }
+    board[targetColmunIndex].push(card);
+    removeCardFromBuffers(buffers, card);
+}
+
+// -- Stacks
+export const moveCardToColumnFromStacks = (board: DealtCards, stacks: CardsStacks, card: Card | undefined, targetColmunIndex: number): void => {
+    if (
+        !board[targetColmunIndex] ||
+        !card
+    ) {
+        return;
+    }
+
+    board[targetColmunIndex].push(card);
+    removeCardFromStacks(stacks, card);
 };
 

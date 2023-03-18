@@ -1,6 +1,6 @@
 import { Card, DealtCards } from "../models/cards";
 import { columnContainsCard, getCardIndexInColumn, getColumnIndexForCard } from "./column.utils";
-import { dealCards, initDeck } from "./gameboard.utils";
+import { dealCards, initDeck } from "./deck.utils";
 
 describe('column utils', () => {
     let column: Array<Card>;

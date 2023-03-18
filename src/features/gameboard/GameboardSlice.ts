@@ -1,9 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import { Card, CardsBuffers, CardsBuffersKeys, CardsStacks, CardsStacksKeys, CardSuit, DealtCards } from "../../models/cards";
+import { isCardInBuffers } from "../../utils/buffers.utils";
 import { compareCards } from "../../utils/card.utils";
 import { getColumnIndexForCard } from "../../utils/column.utils";
-import { dealCards, initDeck, isCardMovableToBuffer, isCardMovableToColumn, isCardMovableToStack, moveCardToColumn, removeCard } from "../../utils/gameboard.utils";
+import { isCardMovableToBuffer, isCardMovableToColumn, isCardMovableToStack, moveCardToColumn, moveCardToColumnFromBuffers, moveCardToColumnFromStacks, removeCard } from "../../utils/gameboard.utils";
+import { dealCards, initDeck, } from '../../utils/deck.utils'
+import { isCardInStacks } from "../../utils/stacks.utils";
 
 export interface GameboardState {
     stacks: CardsStacks;
@@ -62,9 +65,25 @@ export const gameboardSlice = createSlice({
             if (targetColumnIndex === -1) {
                 return;
             }
-            const canPutCardInColumn = isCardMovableToColumn(state.board, state.buffers, state.selectedCard, targetColumnIndex);
+
+            if (isCardInBuffers(state.buffers, state.selectedCard)) {
+                if (isCardMovableToColumn(state.board, state.selectedCard, targetColumnIndex)) {
+                    moveCardToColumnFromBuffers(state.board, state.buffers, state.selectedCard, targetColumnIndex);
+                };
+                state.selectedCard = action.payload;
+                return;
+            }
+            if (isCardInStacks(state.stacks, state.selectedCard)) {
+                if (isCardMovableToColumn(state.board, state.selectedCard, targetColumnIndex)) {
+                    moveCardToColumnFromStacks(state.board, state.stacks, state.selectedCard, targetColumnIndex);
+                }
+                state.selectedCard = action.payload;
+                return;
+            }
+
+            const canPutCardInColumn = isCardMovableToColumn(state.board, state.selectedCard, targetColumnIndex);
             if (canPutCardInColumn) {
-                moveCardToColumn(state.board, state.buffers, state.stacks, state.selectedCard, targetColumnIndex);
+                moveCardToColumn(state.board, state.selectedCard, targetColumnIndex);
                 state.selectedCard = undefined;
                 return;
             }

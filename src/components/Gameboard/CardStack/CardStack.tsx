@@ -1,6 +1,7 @@
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { selectStacks, stackClicked } from "../../../features/gameboard/GameboardSlice";
 import { Card, CardsStacksKeys, CardSuit } from "../../../models/cards";
+import { STACK_KEYS } from "../../../utils/stacks.utils";
 import { CardPlaceholderComponent } from "../../CardPlaceholder/CardPlaceholder";
 import styles from './CardStack.module.css';
 
@@ -12,7 +13,7 @@ export const CardStackComponent = () => {
         dispatch(stackClicked({ stackId, card }));
     };
 
-    const stacks: CardsStacksKeys[] = [CardSuit.Spade, CardSuit.Heart, CardSuit.Club, CardSuit.Diamond];
+    const stacks = STACK_KEYS;
 
     return (
         <div className={styles.wrapper}>

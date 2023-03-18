@@ -1,5 +1,7 @@
-import { Card, CardsBuffers } from "../models/cards";
+import { Card, CardsBuffers, CardsBuffersKeys } from "../models/cards";
 import { compareCards } from "./card.utils";
+
+export const BUFFER_KEYS: CardsBuffersKeys[] = [0, 1, 2, 3];
 
 export const isCardInBuffers = (buffers: CardsBuffers, card: Card | undefined): boolean =>
     getBufferIndexForCard(buffers, card) !== -1;
@@ -8,8 +10,9 @@ export const getBufferIndexForCard = (buffers: CardsBuffers, card: Card | undefi
     Object.values(buffers).findIndex((bufferCard) => compareCards(bufferCard, card));
 
 export const removeCardFromBuffers = (buffers: CardsBuffers, card: Card | undefined): void => {
-    if (isCardInBuffers(buffers, card)) {
-        //buffers[getBufferIndexForCard(buffers,,card)] = undefined;
+    for (const k of BUFFER_KEYS) {
+        if (compareCards(buffers[k], card)) {
+            buffers[k] = undefined;
+        }
     }
-
 }
