@@ -1,6 +1,6 @@
 import { buffer } from "stream/consumers";
 import { Card, CardsBuffers, CardSuit } from "../models/cards.d";
-import { BUFFER_KEYS, getBufferIndexForCard, getFreeBuffer, isCardInBuffers, isCardMovableToBuffer, removeCardFromBuffers } from "./buffers.utils";
+import { BUFFER_KEYS, countFreeBuffers, getBufferIndexForCard, getFreeBuffer, isCardInBuffers, isCardMovableToBuffer, removeCardFromBuffers } from "./buffers.utils";
 
 describe('buffer utils', () => {
     const mockCard: Card = {
@@ -98,6 +98,18 @@ describe('buffer utils', () => {
         it('should return undefined', () => {
             buffers[0] = buffers[1] = buffers[2] = buffers[3] = mockCard;
             expect(getFreeBuffer(buffers)).toBeUndefined();
+        });
+    });
+
+    describe('countFreeBuffers', () => {
+
+        it('should return 4', () => {
+            expect(countFreeBuffers(buffers)).toBe(4);
+        });
+
+        it('should return 0', () => {
+            buffers[0] = buffers[1] = buffers[2] = buffers[3] = mockCard;
+            expect(countFreeBuffers(buffers)).toBe(0);
         });
     });
 });

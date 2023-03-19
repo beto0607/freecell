@@ -27,3 +27,6 @@ export const isCardMovableToBuffer = (buffers: CardsBuffers, bufferId: CardsBuff
 export const getFreeBuffer = (buffers: CardsBuffers): CardsBuffersKeys | undefined =>
     BUFFER_KEYS.find((key) => !buffers[key])
 
+export const countFreeBuffers = (buffers: CardsBuffers): number =>
+    BUFFER_KEYS.reduce((acc: number, key) => !buffers[key] ? acc + 1 : acc, 0);
+

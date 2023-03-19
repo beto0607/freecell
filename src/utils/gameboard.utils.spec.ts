@@ -1,7 +1,7 @@
 import { Card, CardSuit, DealtCards } from '../models/cards.d';
 import { columnContainsCard } from './column.utils';
-import { isCardMovableToColumn, isSingleCardSelection, moveCardToColumn, removeCardFromBoard } from './gameboard.utils';
-import { dealCards, initDeck } from './deck.utils';
+import { getFreeColumnsNumber, isCardMovableToColumn, isSingleCardSelection, moveCardToColumn, removeCardFromBoard } from './gameboard.utils';
+import { dealCards, getEmptyBoard, initDeck } from './deck.utils';
 
 describe('gameboard utils', () => {
     let dealtCards: DealtCards;
@@ -54,18 +54,19 @@ describe('gameboard utils', () => {
     describe('isCardMovableToColumn', () => {
         describe('invalid cards', () => {
             it('should return false - undefined card', () => {
-                expect(isCardMovableToColumn(dealtCards, undefined, 3)).toBe(false);
+                expect(isCardMovableToColumn(dealtCards, 4, undefined, 3)).toBe(false);
             });
 
             it('should return false - invalid target', () => {
-                expect(isCardMovableToColumn(dealtCards, dealtCards[0][0], -1)).toBe(false);
+                expect(isCardMovableToColumn(dealtCards, 4, dealtCards[0][0], -1)).toBe(false);
             });
         });
 
         describe('single', () => {
             it('should return false - card not movable to target', () => {
                 const card = dealtCards[0].at(-1);
-                expect(isCardMovableToColumn(dealtCards, card, 3)).toBe(false);
+                card!.suit = dealtCards[3].at(-1)!.suit;
+                expect(isCardMovableToColumn(dealtCards, 4, card, 3)).toBe(false);
             });
 
             it('should return false - invalid card from buffer/stacks', () => {
@@ -81,7 +82,7 @@ describe('gameboard utils', () => {
                     number: 2,
                     suit: CardSuit.Heart
                 };
-                expect(isCardMovableToColumn(dealtCards, card, 0)).toBe(false);
+                expect(isCardMovableToColumn(dealtCards, 4, card, 0)).toBe(false);
             });
 
             it('should return true - valid card from buffer/stacks', () => {
@@ -97,7 +98,7 @@ describe('gameboard utils', () => {
                     number: 1,
                     suit: CardSuit.Heart
                 };
-                expect(isCardMovableToColumn(dealtCards, card, 0)).toBe(true);
+                expect(isCardMovableToColumn(dealtCards, 4, card, 0)).toBe(true);
             });
 
             it('should return true - last card in column', () => {
@@ -117,14 +118,42 @@ describe('gameboard utils', () => {
                 ];
                 const card = dealtCards[0][0];
 
-                expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(true);
+                expect(isCardMovableToColumn(dealtCards, 4, card, 1)).toBe(true);
             });
         });
 
         describe('multiple cards', () => {
             it('should return false - random cards', () => {
                 let card = dealtCards[0][1];
-                expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(false);
+                expect(isCardMovableToColumn(dealtCards, Infinity, card, 1)).toBe(false);
+            });
+
+            it('should return false - no empty buffers', () => {
+                dealtCards = [
+                    [
+                        {
+                            number: 9,
+                            suit: CardSuit.Club,
+                        },
+                        {
+                            number: 11,
+                            suit: CardSuit.Heart
+                        },
+                        {
+                            number: 10,
+                            suit: CardSuit.Spade
+                        },
+                    ],
+                    [
+                        {
+                            number: 12,
+                            suit: CardSuit.Club,
+                        },
+                    ],
+                ];
+                let card = dealtCards[0][1];
+                expect(isCardMovableToColumn(dealtCards, 0, card, 1)).toBe(false);
+                expect(isCardMovableToColumn(dealtCards, 1, card, 1)).toBe(true);
             });
 
             it('should return true - many cards in column', () => {
@@ -151,9 +180,9 @@ describe('gameboard utils', () => {
                     ],
                 ];
                 let card = dealtCards[0][1];
-                expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(true);
+                expect(isCardMovableToColumn(dealtCards, 4, card, 1)).toBe(true);
                 card = dealtCards[0][2];
-                expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(false);
+                expect(isCardMovableToColumn(dealtCards, 4, card, 1)).toBe(false);
             });
 
             it('should return true - empty target', () => {
@@ -172,15 +201,15 @@ describe('gameboard utils', () => {
                     ],
                 ];
                 let card = dealtCards[0][1];
-                expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(true);
+                expect(isCardMovableToColumn(dealtCards, 4, card, 1)).toBe(true);
                 card = dealtCards[0][0];
-                expect(isCardMovableToColumn(dealtCards, card, 1)).toBe(true);
+                expect(isCardMovableToColumn(dealtCards, 4, card, 1)).toBe(true);
             });
         });
     });
 
     describe('removeCard', () => {
-        it('shouldn\´t remove card - undefined', () => {
+        it('shouldn\'t remove card - undefined', () => {
             const columnLength = dealtCards[1].length;
             removeCardFromBoard(dealtCards, undefined);
             expect(dealtCards[1]).toHaveLength(columnLength);
@@ -214,5 +243,31 @@ describe('gameboard utils', () => {
         });
     });
 
+    describe('getFreeColumnsNumber', () => {
+        it('should return 0', () => {
+            expect(getFreeColumnsNumber(dealtCards, 1)).toBe(0)
+        });
+
+        it('should return 0 - omit empty column', () => {
+            dealtCards[1] = []
+            expect(getFreeColumnsNumber(dealtCards, 1)).toBe(0)
+        });
+
+        it('should return 2 - omit empty column', () => {
+            dealtCards[1] = []
+            dealtCards[2] = []
+            expect(getFreeColumnsNumber(dealtCards, 3)).toBe(2)
+        });
+
+        it('should return 7', () => {
+            dealtCards = getEmptyBoard();
+            expect(getFreeColumnsNumber(dealtCards, 1)).toBe(7)
+        });
+
+        it('should return 8', () => {
+            dealtCards = getEmptyBoard();
+            expect(getFreeColumnsNumber(dealtCards, -1)).toBe(8)
+        });
+    });
 });
 

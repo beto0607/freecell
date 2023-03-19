@@ -1,7 +1,8 @@
+import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
-import { selectStacks, stackSelected } from "../../../features/gameboard/GameboardSlice";
+import { gameEnded, selectStacks, stackSelected } from "../../../features/gameboard/GameboardSlice";
 import { Card, CardsStacksKeys } from "../../../models/cards.d";
-import { STACK_KEYS } from "../../../utils/stacks.utils";
+import { isGameFinished, STACK_KEYS } from "../../../utils/stacks.utils";
 import { CardPlaceholderComponent } from "../../CardPlaceholder/CardPlaceholder";
 import styles from './CardStack.module.css';
 
@@ -13,6 +14,15 @@ export const CardStackComponent = () => {
     const onStackClicked = (stackId: CardsStacksKeys, card: Card | undefined) => {
         dispatch(stackSelected({ stackId, card }));
     };
+
+    useEffect(() => {
+        console.log(cardStack);
+        
+        if (!isGameFinished(cardStack)) {
+            return;
+        }
+        dispatch(gameEnded());
+    }, [dispatch, cardStack]);
 
     const stacks = STACK_KEYS;
 

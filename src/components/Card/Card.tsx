@@ -1,3 +1,4 @@
+import { MouseEventHandler, useState } from 'react';
 import { useAppSelector } from '../../app/hooks';
 import { selectSelectedCard } from '../../features/gameboard/GameboardSlice';
 import { Card, CardColor } from '../../models/cards.d';
@@ -11,19 +12,36 @@ interface CardComponentProps {
     onClick?: (card: Card) => void;
     onDoubleClick?: (card: Card) => void;
 }
+
 var doubleClick = false;
 
 export const CardComponent = ({ card, onClick, onDoubleClick }: CardComponentProps) => {
+    const [highlighted, setHighlighted] = useState(false);
     const selectedCard = useAppSelector(selectSelectedCard);
     const cardColor = getCardColorFor(card);
     const colorClass = cardColor === CardColor.Black ? cardStyles.black : cardStyles.red;
 
     const selectedClass = compareCards(selectedCard, card) ? styles.selected : '';
 
-    const classNames = classes(styles.wrapper, colorClass, selectedClass);
+    const classNames = classes(styles.wrapper, colorClass, selectedClass, highlighted ? styles.highlighted : '');
 
+    const onCardMouseDown: MouseEventHandler<HTMLDivElement> = (e): void => {
+        if (e.button !== 2) {
+            return;
+        }
+        e.preventDefault();
+        setHighlighted(true);
+    }
 
-    const onCardClicked = (): void => {
+    const onCardMouseUp: MouseEventHandler<HTMLDivElement> = (e): void => {
+        if (e.button !== 2) {
+            return;
+        }
+        e.preventDefault();
+        setHighlighted(false);
+    }
+
+    const onCardClicked: MouseEventHandler<HTMLDivElement> = (): void => {
         if (doubleClick) {
             return;
         }
@@ -39,13 +57,14 @@ export const CardComponent = ({ card, onClick, onDoubleClick }: CardComponentPro
         }, 200);
     };
 
-    const onCardDoubleClicked = () => {
+    const onCardDoubleClicked: MouseEventHandler<HTMLDivElement> = () => {
         doubleClick = true;
         onDoubleClick?.(card);
     };
 
     return (
-        <div className={classNames} onClick={onCardClicked} onDoubleClick={onCardDoubleClicked}>
+        <div className={classNames} onClick={onCardClicked} onDoubleClick={onCardDoubleClicked}
+            onContextMenu={(e) => e.preventDefault()} onMouseDown={onCardMouseDown} onMouseUp={onCardMouseUp} >
             <CardNameComponent card={card} isBottom={false} />
             <div className={styles.figure}>
             </div>

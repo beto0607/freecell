@@ -1,6 +1,6 @@
-import { Card, CardsStacks, CardSuit, DealtCards } from "../models/cards.d";
+import { Card, CardsStacks, CardsStacksKeys, CardSuit, DealtCards } from "../models/cards.d";
 import { dealCards, initDeck } from "./deck.utils";
-import { initStacks, isCardInStack, isCardInStacks, isCardMovableToStack, moveCardToColumnFromStacks, removeCardFromStacks } from "./stacks.utils";
+import { initStacks, isCardInStack, isCardInStacks, isCardMovableToStack, isGameFinished, moveCardToColumnFromStacks, removeCardFromStacks } from "./stacks.utils";
 
 describe('stack utils', () => {
     const mockCard: Card = {
@@ -99,29 +99,44 @@ describe('stack utils', () => {
         });
     });
     describe('moveCardToColumnFromStacks', () => {
-        let board: DealtCards;
+        let dealtCards: DealtCards;
 
         beforeEach(() => {
-            board = dealCards(initDeck());
+            dealtCards = dealCards(initDeck());
             stacks[CardSuit.Heart].push(mockCard);
         });
 
         it('should not move anything - undefined card', () => {
-            const columnLength = board[0].length;
-            moveCardToColumnFromStacks(board, stacks, undefined, 0);
-            expect(board[0]).toHaveLength(columnLength);
+            const columnLength = dealtCards[0].length;
+            moveCardToColumnFromStacks(dealtCards, stacks, undefined, 0);
+            expect(dealtCards[0]).toHaveLength(columnLength);
         });
 
         it('should not move anything - invalid column', () => {
-            moveCardToColumnFromStacks(board, stacks, mockCard, -1);
+            moveCardToColumnFromStacks(dealtCards, stacks, mockCard, -1);
             expect(stacks[CardSuit.Heart]).toHaveLength(1);
         });
 
         it('should move card', () => {
-            const columnLength = board[0].length;
-            moveCardToColumnFromStacks(board, stacks, mockCard, 0);
-            expect(board[0]).toHaveLength(columnLength + 1);
+            const columnLength = dealtCards[0].length;
+            moveCardToColumnFromStacks(dealtCards, stacks, mockCard, 0);
+            expect(dealtCards[0]).toHaveLength(columnLength + 1);
             expect(stacks[CardSuit.Heart]).toHaveLength(0);
+        });
+    });
+
+    describe('isGameFinished', () => {
+
+        it('should return false', () => {
+            expect(isGameFinished(stacks)).toBe(false);
+        });
+
+        it('should return true', () => {
+            stacks = initStacks();
+            for (const card of initDeck()) {
+                stacks[card.suit as CardsStacksKeys].push(card);
+            }
+            expect(isGameFinished(stacks)).toBe(true);
         });
     });
 });

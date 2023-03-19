@@ -11,6 +11,7 @@
 
     background-color: rgb(230,230,230);
     cursor: pointer; 
+    transition: 200ms all linear;
 }
 
 .wrapper.selected{
@@ -41,3 +42,7 @@
     place-self: end;
 }
 
+.highlighted{
+    z-index:1000;
+    transform: scale(1.05);
+}

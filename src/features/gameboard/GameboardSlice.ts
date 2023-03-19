@@ -1,8 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { stat } from "fs";
 import { RootState } from "../../app/store";
 import { Card, CardsBuffers, CardsBuffersKeys, CardsStacks, CardsStacksKeys, CardSuit, DealtCards } from "../../models/cards.d";
-import { getFreeBuffer, isCardInBuffers, isCardMovableToBuffer, removeCardFromBuffers } from "../../utils/buffers.utils";
+import { countFreeBuffers, getFreeBuffer, isCardInBuffers, isCardMovableToBuffer, removeCardFromBuffers } from "../../utils/buffers.utils";
 import { compareCards } from "../../utils/card.utils";
 import { getColumnIndexForCard } from "../../utils/column.utils";
 import { dealCards, initDeck } from '../../utils/deck.utils';
@@ -15,6 +14,7 @@ export interface GameboardState {
     board: DealtCards; // 6 columns
     boardInitialized: boolean;
     selectedCard?: Card;
+    gameEnded: boolean;
 };
 
 const initialStacks: CardsStacks = {
@@ -36,6 +36,7 @@ const initialState: GameboardState = {
     buffers: initialBuffers,
     board: [],
     boardInitialized: false,
+    gameEnded: false,
 };
 
 
@@ -50,45 +51,53 @@ export const gameboardSlice = createSlice({
             state.board = dealCards(deck);
             state.boardInitialized = true;
         },
-        selectCard: (state, action: PayloadAction<{ card: Card | undefined }>) => {
-            console.log(action.payload);
+        gameEnded: (state) => {
+            state.boardInitialized = false;
+            state.gameEnded = true;
+        },
+        selectCard: (state, { payload: { card, columnClicked } }: PayloadAction<{ card: Card | undefined, columnClicked?: number }>): void => {
             if (!state.selectedCard) {
-                state.selectedCard = action.payload.card;
+                state.selectedCard = card;
                 return;
             }
-            if (compareCards(action.payload.card, state.selectedCard)) {
+            if (compareCards(card, state.selectedCard)) {
                 state.selectedCard = undefined;
                 return;
             }
-            const targetColumnIndex = getColumnIndexForCard(state.board, action.payload.card);
+            const targetColumnIndex = columnClicked ?? getColumnIndexForCard(state.board, card);
             if (targetColumnIndex === -1) {
                 return;
             }
 
+            const freeBuffersNumber = countFreeBuffers(state.buffers);
             if (isCardInBuffers(state.buffers, state.selectedCard)) {
-                if (isCardMovableToColumn(state.board, state.selectedCard, targetColumnIndex)) {
+                if (isCardMovableToColumn(state.board, freeBuffersNumber, state.selectedCard, targetColumnIndex)) {
                     moveCardToColumn(state.board, state.selectedCard, targetColumnIndex);
                     removeCardFromBuffers(state.buffers, state.selectedCard);
+                    state.selectedCard = undefined;
+                    return;
                 };
-                state.selectedCard = action.payload.card;
+                state.selectedCard = card;
                 return;
             }
             if (isCardInStacks(state.stacks, state.selectedCard)) {
-                if (isCardMovableToColumn(state.board, state.selectedCard, targetColumnIndex)) {
+                if (isCardMovableToColumn(state.board, freeBuffersNumber, state.selectedCard, targetColumnIndex)) {
                     moveCardToColumn(state.board, state.selectedCard, targetColumnIndex);
                     removeCardFromStacks(state.stacks, state.selectedCard);
+                    state.selectedCard = undefined;
+                    return;
                 }
-                state.selectedCard = action.payload.card;
+                state.selectedCard = card;
                 return;
             }
 
-            const canPutCardInColumn = isCardMovableToColumn(state.board, state.selectedCard, targetColumnIndex);
+            const canPutCardInColumn = isCardMovableToColumn(state.board, freeBuffersNumber, state.selectedCard, targetColumnIndex);
             if (canPutCardInColumn) {
                 moveCardToColumn(state.board, state.selectedCard, targetColumnIndex);
                 state.selectedCard = undefined;
                 return;
             }
-            state.selectedCard = action.payload.card;
+            state.selectedCard = card;
         },
         moveCard: (state, { payload: { card } }: PayloadAction<{ card: Card | undefined }>) => {
             if (!card) {
@@ -107,6 +116,7 @@ export const gameboardSlice = createSlice({
                 removeCardFromBuffers(state.buffers, state.selectedCard);
                 removeCardFromBoard(state.board, state.selectedCard);
                 state.stacks[stackId]!.push(state.selectedCard);
+                state.selectedCard = undefined;
                 return;
             }
             const freeBuffer = getFreeBuffer(state.buffers);
@@ -117,6 +127,7 @@ export const gameboardSlice = createSlice({
                 removeCardFromStacks(state.stacks, state.selectedCard);
                 removeCardFromBoard(state.board, state.selectedCard);
                 state.buffers[freeBuffer] = state.selectedCard;
+                state.selectedCard = undefined;
             }
         },
         bufferSelected: (state, { payload: { bufferId, card } }: PayloadAction<{ bufferId: CardsBuffersKeys, card: Card | undefined }>) => {
@@ -173,9 +184,10 @@ export const gameboardSlice = createSlice({
     },
 });
 
-export const { initNewGame, selectCard, bufferSelected, stackSelected, moveCard } = gameboardSlice.actions;
+export const { initNewGame, selectCard, gameEnded, bufferSelected, stackSelected, moveCard } = gameboardSlice.actions;
 
 export const selectBoardInitialized = ({ gameboard }: RootState) => gameboard.boardInitialized;
+export const selectGameEnded = ({ gameboard }: RootState) => gameboard.gameEnded;
 export const selectStacks = ({ gameboard }: RootState) => gameboard.stacks;
 export const selectBuffers = ({ gameboard }: RootState) => gameboard.buffers;
 export const selectBoard = ({ gameboard }: RootState) => gameboard.board

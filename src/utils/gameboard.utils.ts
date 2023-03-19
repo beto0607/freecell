@@ -25,7 +25,7 @@ export const moveCardToColumn = (board: DealtCards, card: Card | undefined, targ
     ];
 };
 
-export const isCardMovableToColumn = (board: DealtCards, card: Card | undefined, targetColmunIndex: number): boolean => {
+export const isCardMovableToColumn = (board: DealtCards, freeBuffersNumber: number, card: Card | undefined, targetColmunIndex: number): boolean => {
     const targetColumn = board[targetColmunIndex];
     if (!card || !targetColumn) {
         return false;
@@ -43,8 +43,12 @@ export const isCardMovableToColumn = (board: DealtCards, card: Card | undefined,
         return targetColumn.length === 0 ||
             isCardStackableWith(card, targetColumn.at(-1));
     }
+    const freeColumnsNumber = getFreeColumnsNumber(board, targetColmunIndex) || 1;
     // Multiple cards
     const stackOfCardsToMove = sourceColumn.slice(cardIndexInColumn);
+    if (stackOfCardsToMove.length > (freeBuffersNumber + 1) * freeColumnsNumber) {
+        return false;
+    }
     for (let i = 1; i < stackOfCardsToMove.length; i++) {
         if (!isCardStackableWith(stackOfCardsToMove[i], stackOfCardsToMove[i - 1])) {
             return false;
@@ -67,9 +71,17 @@ export const removeCardFromBoard = (board: DealtCards, card: Card | undefined): 
     }
 };
 
-export const isSingleCardSelection = (board: DealtCards, card: Card | undefined): boolean=> {
+export const isSingleCardSelection = (board: DealtCards, card: Card | undefined): boolean => {
     if (!card) {
         return false;
     }
     return board.some((column) => isLastCardForColumn(column, card));
 };
+
+export const getFreeColumnsNumber = (board: DealtCards, omitColumn: number): number =>
+    board.reduce((acc, column, index, _arr): number =>
+        omitColumn === index || !!column.length ?
+            acc :
+            (acc + 1),
+        0);
+

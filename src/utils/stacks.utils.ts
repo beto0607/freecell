@@ -60,3 +60,5 @@ export const moveCardToColumnFromStacks = (board: DealtCards, stacks: CardsStack
     removeCardFromStacks(stacks, card);
 };
 
+export const isGameFinished = (stacks: CardsStacks): boolean =>
+    STACK_KEYS.reduce((acc, key): number => acc + stacks[key].length, 0) === 52;
