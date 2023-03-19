@@ -2,7 +2,10 @@
     width: 100vw;
     display:grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: calc(1em + var(--card-height)) auto;
+    grid-template-rows: 50px calc(1em + var(--card-height)) auto;
+}
+.header {
+    grid-column: span 2;
 }
 .board{
     grid-column: span 2;
